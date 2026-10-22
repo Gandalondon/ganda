@@ -78,6 +78,11 @@ type PrototypeEmbedBlock = {
   // prototype_embed's own no-border iframe). Toggle on in Storyblok if
   // the uploaded fallback screenshot needs one to read correctly.
   show_image_border?: boolean;
+  // Full width (22 Oct 2026, for the Sniff dogs): with no title or body,
+  // the embed runs edge to edge like an image block, at 4:3, and shows on
+  // every screen size (no fallback image needed). Off by default, so
+  // existing embeds keep their 880x922 prototype frame.
+  full_width?: boolean;
 };
 
 type Block =
@@ -143,10 +148,11 @@ function PrototypeEmbed({
   // prototype in the page instead of leaving it pinned to the (empty)
   // right-hand track of the two-column split.
   const hasText = Boolean(block.title || block.body);
+  const fullWidth = block.full_width === true && !hasText;
 
   const media = (
     <>
-      {showPrototype && block.prototype_url ? (
+      {(showPrototype || fullWidth) && block.prototype_url ? (
         <iframe
           src={block.prototype_url}
           title={block.title || "Interactive prototype"}
@@ -170,7 +176,13 @@ function PrototypeEmbed({
               // export's own centering as-is.
             }
           }}
-          style={{
+          style={fullWidth ? {
+            width: "100%",
+            aspectRatio: "4 / 3",
+            height: "auto",
+            border: "none",
+            display: "block",
+          } : {
             width: "100%",
             // Locked to the export's real design canvas ratio (full
             // prototype incl. side panel: 880x922). maxHeight caps the
@@ -211,7 +223,7 @@ function PrototypeEmbed({
   if (!hasText) {
     return (
       <div className="gd-container" style={{ marginTop: "calc(176 * var(--u))" }}>
-        <div style={{ maxWidth: "calc(880 * var(--u))", margin: "0 auto" }}>{media}</div>
+        <div style={fullWidth ? undefined : { maxWidth: "calc(880 * var(--u))", margin: "0 auto" }}>{media}</div>
       </div>
     );
   }
