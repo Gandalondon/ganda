@@ -238,6 +238,26 @@ export default async function WritingPage() {
                   {para}
                 </p>
               ))}
+              {/* Under the bio: the one way to get in touch from this page. */}
+              {sec.title?.trim().toLowerCase() === "author" && (
+                <p
+                  style={{
+                    ...bodyTextStyle,
+                    marginTop: "1.2em",
+                    textWrap: "pretty" as React.CSSProperties["textWrap"],
+                  }}
+                >
+                  If you enjoyed reading my stories or have anything to share,
+                  contact me at{" "}
+                  <a
+                    href="mailto:tony@gandalondon.com"
+                    style={{ color: "inherit", textDecoration: "underline" }}
+                  >
+                    tony@gandalondon.com
+                  </a>
+                  .
+                </p>
+              )}
             </div>
           </div>
         </div>
