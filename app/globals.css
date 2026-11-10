@@ -79,6 +79,13 @@ button:focus-visible {
   border-radius: 2px;
 }
 
+/* YouTube play button fills a clipped frame, so its focus ring sits inside. */
+.gd-yt-play:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: -6px;
+  border-radius: 0;
+}
+
 /* Skip link: off screen until it gets keyboard focus. */
 .gd-skip {
   position: absolute;

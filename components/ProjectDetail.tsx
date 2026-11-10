@@ -4,6 +4,7 @@ import { useStoryblokState } from "@storyblok/react";
 import { useEffect, useState } from "react";
 import WorkGrid from "@/components/WorkGrid";
 import BlurImage from "@/components/BlurImage";
+import YouTubeEmbed, { type YouTubeBlock } from "@/components/YouTubeEmbed";
 import { typeset, renderInlineLinks } from "@/lib/inline";
 import type { WorkProject } from "@/lib/storyblok";
 
@@ -91,7 +92,8 @@ type Block =
   | TextBlockSections
   | HeroBlock
   | QuoteBlock
-  | PrototypeEmbedBlock;
+  | PrototypeEmbedBlock
+  | YouTubeBlock;
 
 type StoryContent = {
   title?: string;
@@ -297,6 +299,7 @@ export default function ProjectDetail({
       case "hero_block":
       case "image":
       case "quote_block":
+      case "YouTube":
         return false;
       default:
         return Boolean((b as { Title?: string }).Title);
@@ -505,6 +508,10 @@ export default function ProjectDetail({
                 )}
               </div>
             );
+          }
+
+          if (block.component === "YouTube") {
+            return <YouTubeEmbed key={i} block={block} />;
           }
 
           if (block.component === "prototype_embed") {
