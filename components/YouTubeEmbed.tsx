@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // YouTube video for case studies (10 Nov 2026). Nested Storyblok component:
 // YouTube, with one text field, `video`, holding any YouTube link.
@@ -54,10 +54,35 @@ export default function YouTubeEmbed({ block }: { block: YouTubeBlock }) {
   // maxresdefault is missing for some older or smaller videos; drop to
   // hqdefault (always there) if it fails to load.
   const [thumb, setThumb] = useState<"maxresdefault" | "hqdefault">("maxresdefault");
+  const frame = useRef<HTMLIFrameElement>(null);
+
+  // Captions off by default. YouTube ignores cc_load_policy=0 when the
+  // viewer's account or the video itself turns captions on, so once the
+  // player is up we also tell it to drop the captions module. Repeated for
+  // a few seconds because the player only listens once it has loaded.
+  // Viewers can still turn captions on with the CC button.
+  useEffect(() => {
+    if (!playing) return;
+    const send = (msg: object) =>
+      frame.current?.contentWindow?.postMessage(JSON.stringify(msg), "https://www.youtube-nocookie.com");
+    let n = 0;
+    const timer = window.setInterval(() => {
+      send({ event: "listening" });
+      send({ event: "command", func: "unloadModule", args: ["captions"] });
+      if (++n >= 16) window.clearInterval(timer);
+    }, 500);
+    return () => window.clearInterval(timer);
+  }, [playing]);
 
   if (!parsed) return null;
 
-  const params = new URLSearchParams({ autoplay: "1", rel: "0", playsinline: "1" });
+  const params = new URLSearchParams({
+    autoplay: "1",
+    rel: "0",
+    playsinline: "1",
+    cc_load_policy: "0",
+    enablejsapi: "1",
+  });
   if (parsed.start) params.set("start", String(parsed.start));
   const src = `https://www.youtube-nocookie.com/embed/${parsed.id}?${params}`;
 
@@ -75,6 +100,7 @@ export default function YouTubeEmbed({ block }: { block: YouTubeBlock }) {
       >
         {playing ? (
           <iframe
+            ref={frame}
             src={src}
             title="YouTube video"
             allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
@@ -129,8 +155,17 @@ export default function YouTubeEmbed({ block }: { block: YouTubeBlock }) {
                 justifyContent: "center",
               }}
             >
-              <svg viewBox="0 0 24 24" width="36%" height="36%" style={{ marginLeft: "8%" }}>
-                <path d="M6 3.5v17L20 12z" fill="#000" />
+              {/* Triangle's centroid sits on the circle's centre (x 12, y 12):
+                  optically centred, as a pure bounding-box centre looks
+                  pushed left. Vertically exact. */}
+              <svg
+                viewBox="0 0 24 24"
+                width="38%"
+                height="38%"
+                aria-hidden="true"
+                style={{ display: "block", overflow: "visible" }}
+              >
+                <path d="M7.75 4.5v15L20.5 12z" fill="#000" />
               </svg>
             </span>
           </button>
