@@ -43,7 +43,8 @@ p{margin:0;text-wrap:pretty}
 .btn.sm{height:40px;padding:0 20px;font-size:16px}
 
 /* the weather wash: the day's colour, full window, cycling with the art (same timing, so the edges never show) */
-.wash{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;z-index:0;  /* 20:17 lvh: as tall as the screen with the address bar hidden, so no white strip when it slides away on phones */
+.wash{position:fixed;top:-25vh;left:0;right:0;height:150vh;top:-25lvh;height:150lvh;z-index:0;  /* 22:10 overscan: Android Chrome lags fixed layers on a fast flick, which uncovered a white band at the bottom; a quarter screen spare above and below covers it */
+    /* 20:17 lvh: as tall as the screen with the address bar hidden, so no white strip when it slides away on phones */
   pointer-events:none;background:#4A789F;animation:wash var(--cyc) linear infinite;opacity:var(--wash,1)}
 @keyframes wash{
   0%,16%{background:#4A789F} 20%,36%{background:#C08021} 40%,56%{background:#616461} 60%,76%{background:#B7935B} 80%,96%{background:#8B7A62} 100%{background:#4A789F}
@@ -97,7 +98,7 @@ html.clear .step .btn{background:var(--ink);color:#FFFFFF}
 @media (max-width:900px){
   :root{--hdr:72px}
   .hero{padding-bottom:64px}
-  .hero .art.walls{animation:none;background:transparent}  /* lines sit straight on the wash, so they fade with it */
+  .hero .art.walls{animation:none;background:transparent;opacity:var(--wash,1)}  /* lines sit straight on the wash and fade out with it as you scroll (22:10: they stayed white, so white on cream) */
   .stage .wrap{display:block}
   .park{display:none}
   .hero{min-height:100svh;padding-top:calc(var(--hdr) + 48px)}
