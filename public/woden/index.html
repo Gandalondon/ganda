@@ -5,198 +5,205 @@
 <meta charset="utf-8">
 <base href="/woden/">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#FFFFFF">
+<meta name="theme-color" content="#4A789F">
 <title>Woden</title>
-<meta name="description" content="Discover a country walk you have never done, without the research. Woden picks it, gets you there on proper roads, then gets out of the way.">
-<link rel="stylesheet" href="site.css"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3E%3Ccircle cx='36' cy='36' r='36' fill='%231E1E1C'/%3E%3Cg transform='translate(16 21) scale(.1194)'%3E%3Cpath fill='%23FFFFFF' d='M170.30%20148.02%20L220.79%20249.00%20L270.52%20249.00%20L324.58%2048.19%20L276.75%2048.19%20L240.10%20184.35%20L196.12%2096.39%20L144.48%2096.39%20L101.65%20182.04%20L57.92%20-0.00%20L10.42%20-0.00%20L70.24%20249.00%20L119.81%20249.00%20L170.30%20148.02%20Z'/%3E%3C/g%3E%3C/svg%3E">
+<meta name="description" content="Discover a country walk you've never done, without the research. Woden picks it, gets you there, then gets out of the way.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2072%2072'%3E%3Ccircle%20cx='36'%20cy='36'%20r='36'%20fill='%231A1A1A'/%3E%3Cg%20transform='translate(12.0%2021.4)%20scale(0.1169)'%3E%3Cpath%20fill='%23FFFFFF'%20d='M208.98%20167.00%20L276.09%20249.00%20L338.72%20249.00%20L404.39%2065.60%20L347.88%2065.60%20L301.27%20195.76%20L243.36%20125.00%20L174.61%20125.00%20L117.92%20194.25%20L55.86%200.00%20L0.00%200.00%20L79.56%20249.00%20L141.87%20249.00%20Z'/%3E%3C/g%3E%3C/svg%3E">
 <style>
-/* v5 (5 Nov): one phone. It floats under the word, travels down, then parks while the story scrolls past. */
-.hdr{position:fixed;inset:0 0 auto;z-index:20;background:var(--bg);padding-top:env(safe-area-inset-top,0px)}
-.hdr .wrap{height:88px}
-.hdr .btn.sm{height:40px;padding:0 20px;font-size:16px;letter-spacing:var(--tr-nav)}
-@media (max-width:600px){ .hdr .btn.sm{height:36px;padding:0 16px} }
-.heyhero{position:relative;min-height:100svh;display:flex;align-items:center;padding-top:88px;padding-bottom:0}
-.heyhero .wrap{display:block;max-width:none}
-.heyhero .word{margin:0;font-weight:600;font-size:min(7.5vw,calc((100svh - 300px) / 2.3));line-height:.94;letter-spacing:var(--tr-display);white-space:pre-line;width:max-content;color:var(--text-hi);position:relative;z-index:1}
-.heyhero .lede{position:relative;z-index:1;margin-top:32px;max-width:min(600px,calc(100% - 384px));font-size:var(--lede);line-height:var(--lede-lh)}
-.phone{--pw:clamp(200px,min(19vw,calc((100svh - 200px) * 0.462)),320px)}
-.p3{position:relative;transform-style:preserve-3d;will-change:transform;--d:16px}
-.p3 .slab{position:absolute;inset:0;border-radius:inherit;background:#1E1E1C;transform:translateZ(calc(var(--k) * var(--d) / -12))}
-.p3 .slab.rim{background:#3A3A37}
-.p3 .screen{position:absolute;inset:calc(var(--pw) * .028);width:auto;height:auto;transform:translateZ(.5px);opacity:0;transition:opacity .45s ease}
-.p3 .screen.on{opacity:1}
-/* the story: text column on the left gutter, the parked phone centred in the space to its right */
-.story{position:relative;max-width:none}
-.story .wrap{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}
-.steps{display:flex;flex-direction:column}
-.step{min-height:calc(100svh - 88px);display:flex;align-items:center}
-.step h2{font-size:var(--h2);line-height:1;font-weight:600;letter-spacing:var(--tr-h2)}
-.step p{margin-top:24px;max-width:26em;font-size:var(--body);line-height:var(--body-lh)}
+/* Woden concept page, version B (13 Nov): the day's colours fill the whole hero, the line art sits where the phone will be.
+   On scroll the colour drains away and a front-on phone frame appears round the art. No angled phone. */
+@font-face{font-family:"Inter";font-weight:100 900;font-display:swap;src:url(fonts/inter-latin-opsz-wght.woff2) format("woff2-variations"),url(fonts/inter-latin-opsz-wght.woff2) format("woff2")}
+@font-face{font-family:"Zalando Sans Expanded";font-weight:200 900;font-display:swap;src:url(fonts/zalando-sans-expanded-latin-wght.woff2) format("woff2-variations"),url(fonts/zalando-sans-expanded-latin-wght.woff2) format("woff2")}
+:root{
+  --ink:#1A1A1A; --bg:#FFFFFF;
+  --font:"Inter","Helvetica Neue",Arial,system-ui,sans-serif;
+  --display:"Zalando Sans Expanded","Inter",sans-serif;
+  --h1:min(calc((100vw - 2 * var(--edge)) / 9.2), 18.5svh);  /* 19:50 midpoint size (same as the flip): about 113px in a 1167 x 606 window, 139px at 1440. The headline runs past its column but stops short of the route art */ --h2:clamp(32px,3.7vw,52px);
+  --body:20px; --body-lh:32px; --lede:24px; --lede-lh:34px;
+  --edge:24px; --hdr:88px;
+  --pw:clamp(220px,min(21vw,calc((100svh - 176px) * 0.462)),340px);  /* phone width: fits the window height */
+  --cyc:15s;  /* one full round of the five days */
+  color-scheme:light;
+}
+@media (min-width:1024px){ :root{ --edge:64px } }
+@media (min-width:1440px){ :root{ --edge:80px } }
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--body)/var(--body-lh) var(--font);font-optical-sizing:auto;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+h1,h2{margin:0;font-family:var(--display);font-weight:600;letter-spacing:0;text-wrap:balance}
+p{margin:0;text-wrap:pretty}
+.nw{white-space:nowrap}
+.wrap{padding-left:var(--edge);padding-right:var(--edge)}
+:focus-visible{outline:3px solid currentColor;outline-offset:3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:56px;padding:0 32px;border-radius:999px;background:var(--ink);color:#FFFFFF;font:600 18px/1 var(--font);white-space:nowrap;transition:background .3s ease,color .3s ease}
+.btn:hover{background:#3A3A37}
+.btn.sm{height:40px;padding:0 20px;font-size:16px}
+
+/* the weather wash: the day's colour, full window, cycling with the art (same timing, so the edges never show) */
+.wash{position:fixed;inset:0;z-index:0;pointer-events:none;background:#4A789F;animation:wash var(--cyc) linear infinite;opacity:var(--wash,1)}
+@keyframes wash{
+  0%,16%{background:#4A789F} 20%,36%{background:#C08021} 40%,56%{background:#616461} 60%,76%{background:#B7935B} 80%,96%{background:#8B7A62} 100%{background:#4A789F}
+}
+
+/* header: white on the colour, ink once the colour has gone */
+.hdr{position:absolute;inset:0 0 auto;z-index:20;transition:background .4s ease,color .4s ease;color:#FFFFFF}
+.hdr .wrap{height:var(--hdr);display:flex;align-items:center}  /* logo left, static, alone (19:49): everything else on the page is left-aligned */
+html.clear .hdr{background:var(--bg);color:var(--ink)}
+.hdr::before{content:"";position:absolute;inset:0;z-index:-1;animation:wash var(--cyc) linear infinite;opacity:var(--wash,1);transition:opacity .4s ease}
+html.clear .hdr::before{opacity:0}
+.logo{--mk:32px;display:inline-flex;align-items:baseline;font:600 calc(var(--mk) * .866 * 65 / 72)/1 var(--display);letter-spacing:0;color:inherit}
+.logo svg{width:1.1774em;height:0.714em;margin:0 -.01em 0 0;flex:none}
+.logo path{fill:currentColor}
+@media (max-width:600px){ .logo{--mk:22px} }
+
+/* one stage: text on the left, the phone parked on the right for the whole story */
+.stage{position:relative;z-index:1}
+.stage .wrap{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:64px}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-top:var(--hdr);color:#FFFFFF}
+.hero h1{font-size:var(--h1);line-height:.94;margin-left:-.03em;white-space:nowrap}
+.hero .lede{margin-top:40px;max-width:24em;font-size:var(--lede);line-height:var(--lede-lh)}
+.step{min-height:calc(100svh - var(--hdr));display:flex;align-items:center}
+.step h2{font-size:var(--h2);line-height:1}
+.step p{margin-top:24px;max-width:26em}
 .step .btn{margin-top:40px}
-.park{position:sticky;top:88px;height:calc(100svh - 88px);display:flex;align-items:center;justify-content:center;perspective:1400px}
-.park .p3{visibility:hidden}
-html.parked .park .p3{visibility:visible}
-html.landing .park .p3{visibility:hidden}
+.step.fin h2{font-size:clamp(44px,4.8vw,76px);line-height:.94}
+/* after the hero the page stays white to the end: ink text, black buttons. The finale keeps the phone and plays the coloured maps in it. */
+.step,.ftr{color:#FFFFFF;transition:color .4s ease}
+html.clear .step,html.clear .ftr{color:var(--ink)}
+.step .btn{background:#FFFFFF;color:var(--ink)}
+html.clear .step .btn{background:var(--ink);color:#FFFFFF}
+
+.park{position:sticky;top:0;height:100svh;display:flex;align-items:center;justify-content:center;padding-top:var(--hdr)}
+/* the phone: straight on. In the hero only its screen shows, the same colour as the wash, so the art looks loose on the page */
+.phone{position:relative;width:var(--pw);aspect-ratio:390/844}
+.frame{position:absolute;inset:calc(var(--pw) * -.0571);border-radius:calc(var(--pw) * .1714);background:#1A1A1A;opacity:var(--frame,0)}  /* Sniff proportions: 16px bezel, 48px outer and 32px screen radius on a 280px screen */
+.screen{position:absolute;inset:0;border-radius:calc(var(--pw) * .1143 * var(--frame,0));overflow:hidden;opacity:0;transition:opacity .45s ease}
+.screen.on{opacity:1}
+.screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+/* the walls: white lines on transparent, over a background running the wash's own animation, so colour and wash never drift apart.
+   Each line fades in while the colour changes, holds, then fades out as the next comes in. */
+.walls{animation:wash var(--cyc) linear infinite}
+.walls img{opacity:0;animation:wl var(--cyc) linear infinite}
+.walls img:nth-child(1){animation-delay:calc(var(--cyc) * -.04)}
+.walls img:nth-child(2){animation-delay:calc(var(--cyc) * .16)}
+.walls img:nth-child(3){animation-delay:calc(var(--cyc) * .36)}
+.walls img:nth-child(4){animation-delay:calc(var(--cyc) * .56)}
+.walls img:nth-child(5){animation-delay:calc(var(--cyc) * .76)}
+@keyframes wl{0%{opacity:0}4%,20%{opacity:1}24%,100%{opacity:0}}
 .mphone{display:none}
-.flyer{position:absolute;z-index:3;left:0;top:0;perspective:1400px;pointer-events:none;will-change:transform}
-html.parked .flyer,html.landing .flyer{visibility:hidden}
-.ftr{padding-top:96px}
-/* finale: the hero's words mirrored, the phone turned the other way, showing the home greeting */
-.finale .wrap{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;min-height:calc(100svh - 88px - var(--fh,150px));align-items:center;padding-block:32px}
-.fin{margin:0;font-weight:600;font-size:min(5.6vw,calc((100svh - 88px - var(--fh,150px) - 200px) / 2.1));line-height:.94;letter-spacing:var(--tr-display);white-space:pre-line;width:max-content;color:var(--text-hi)}
-.ftxt .btn{margin-top:48px}
-.fslot{display:flex;justify-content:center;perspective:1400px}
-.fslot .phone{--pw:clamp(180px,min(22vw,calc((100svh - 320px) * 0.42)),380px)}
-.fphone{transform:rotateX(22deg) rotateY(34deg) rotateZ(-10deg)}
-html.fx .fphone{visibility:hidden}
-.lander{position:absolute;z-index:3;left:0;top:0;perspective:1400px;pointer-events:none;will-change:transform;display:none}
-html.landing .lander{display:block}
-.screen.home{background:var(--bg)}
-.screen.home .fill{flex:1 1 auto}
-.screen.home .cog{color:var(--amber);width:1.75em;height:1.75em;flex:none}
-.screen.home .cog svg{display:block;width:100%;height:100%}
+.ftr{position:relative;z-index:1;padding:96px 0 calc(48px + env(safe-area-inset-bottom,0px));font-size:16px;line-height:24px}
+
 @media (max-width:900px){
-  .hdr .wrap{height:72px}
-  .heyhero{padding-top:calc(140px + env(safe-area-inset-top,0px));padding-bottom:0}
-  .heyhero .word{font-size:16vw}
-  .heyhero .lede{max-width:none;margin-top:24px}
-  .story .wrap{display:block}
-  .park,.flyer,.lander,.fslot{display:none}
-  .step{min-height:0;display:block;padding-block:64px}
-  .step:first-child{padding-top:54px}
+  :root{--hdr:72px}
+  .hero{padding-bottom:64px}
+  .hero .art.walls{animation:none;background:transparent}  /* lines sit straight on the wash, so they fade with it */
+  .stage .wrap{display:block}
+  .park{display:none}
+  .hero{min-height:100svh;padding-top:calc(var(--hdr) + 48px)}
+  .hero h1{font-size:calc((100vw - 2 * var(--edge)) / 6.3)}
+  .hero .lede{margin-top:24px;font-size:21px;line-height:31px}
+  .hero .art{margin:40px auto 0;width:min(260px,60vw)}
+  .step,.step.fin{min-height:0;display:block;padding-block:64px}
+  .step.fin h2{font-size:9.6vw}
   .mphone{display:flex;justify-content:center;margin-top:56px}
   .mphone .phone{--pw:min(300px,78vw)}
-  .finale .wrap{display:block;min-height:0;padding-block:112px 0}
-  .fin{font-size:12vw}
+  .mphone .frame{opacity:1}
+  .mphone .screen{opacity:1;border-radius:calc(var(--pw) * .1143)}
+  .step.fin{padding-top:96px}
 }
+@media (min-width:901px){ .hero .art{display:none} }
+.art{position:relative;aspect-ratio:390/844}
+.art img{position:absolute;inset:0;width:100%;height:100%}
 @media (prefers-reduced-motion:reduce){
-  .flyer{display:none}
-  .park .p3{visibility:visible}
-  .lander{display:none}
-  .p3 .screen{transition:none}
+  .wash,.walls,.walls img,.hdr::before,.hero,.step.fin,.ftr{animation:none}
+  .walls{background:#4A789F}.walls img{opacity:0}.walls img:first-child{opacity:1}
+  .screen{transition:none}
 }
 </style>
 </head>
 <body>
+<div class="wash" aria-hidden="true"></div>
 <header class="hdr"><div class="wrap">
   <a class="logo" href="./" id="logo" aria-label="Woden">
-    <svg viewBox="0 0 335 249" aria-hidden="true" style="width:calc(var(--mk) * .86);height:calc(var(--mk) * .64);transform:none;overflow:visible"><defs><mask id="wtrace" maskUnits="userSpaceOnUse" x="-20" y="-60" width="380" height="360"><path class="trace" d="M19.7 -40 L94 262 L170.3 96.4 L246.6 262 L316.9 -24" pathLength="1" stroke-dasharray="1 1"></path></mask></defs><path d="M170.30 148.02 L220.79 249.00 L270.52 249.00 L324.58 48.19 L276.75 48.19 L240.10 184.35 L196.12 96.39 L144.48 96.39 L101.65 182.04 L57.92 -0.00 L10.42 -0.00 L70.24 249.00 L119.81 249.00 L170.30 148.02 Z" mask="url(#wtrace)"></path></svg>
-    <span class="name">Woden</span>
+    <svg viewBox="0 0 404.39 249" aria-hidden="true" style="overflow:visible"><path d="M208.98 167.00 L276.09 249.00 L338.72 249.00 L404.39 65.60 L347.88 65.60 L301.27 195.76 L243.36 125.00 L174.61 125.00 L117.92 194.25 L55.86 0.00 L0.00 0.00 L79.56 249.00 L141.87 249.00 Z"></path></svg>
+    <span aria-hidden="true">oden</span>
   </a>
-  <div class="hright"><a class="btn sm" href="mailto:tony@gandalondon.com?subject=Woden">Interested?</a></div>
 </div></header>
-<div class="site">
-<main>
-  <section class="heyhero">
-    <div class="wrap">
-      <h1 class="word">Less app.
-More walk.</h1>
-      <p class="lede">Discover a country walk you have never done, without the research. Woden picks it, gets you there on proper roads, then gets out of the way.</p>
-    </div>
-  </section>
-  <div class="story"><div class="wrap">
+<main class="stage"><div class="wrap">
   <div class="steps">
+    <section class="hero">
+      <h1>Less app.<br>More walk.</h1>
+      <p class="lede">Discover a country walk you’ve never done, without the research. Woden picks it, gets you there, then gets out of the way.</p>
+      <div class="art walls" aria-hidden="true"><img src="screens/line-0.webp" alt=""><img src="screens/line-1.webp" alt=""><img src="screens/line-2.webp" alt=""><img src="screens/line-3.webp" alt=""><img src="screens/line-4.webp" alt=""></div>
+    </section>
     <section class="step" data-i="0">
-      <div class="txt"><h2>Set it once</h2>
-        <p>Where you set off from, how long you’ll drive, how long you want to walk. Tell Woden once and it remembers.</p></div>
-      <div class="mphone"><div class="phone"><div class="screen shot"><img src="screens/set.webp" alt="Set it once: Home SW20, drive up to 1h 15, walk 2 to 3 hours, quiet over busy." loading="lazy" decoding="async"></div></div></div>
+      <div><h2>No set-up</h2>
+        <p>Open it and today’s walk is already there. Change where you set off from, how long you want to drive or how long you want to walk, and it finds another.</p></div>
+      <div class="mphone"><div class="phone"><i class="frame"></i><div class="screen"><img src="screens/set.webp" alt="Today, with the drive length open: up to 30 min, 1 hour, 1h 30 or 2 hours." loading="lazy"></div></div></div>
     </section>
     <section class="step" data-i="1">
-      <div class="txt"><h2>Discover somewhere new</h2>
-        <p>No googling, no asking AI, no list of 400 trails to scroll. Woden finds one established walk you haven’t done, picked for the day and its weather. Google Maps drives you there on proper roads, keeping off single-track lanes where it can.</p></div>
-      <div class="mphone"><div class="phone"><div class="screen shot"><img src="screens/today.webp" alt="Today's walk: Chanctonbury Ring, 1h 13 drive, no single-track lanes, 5.8 km walk." loading="lazy" decoding="async"></div></div></div>
+      <div><h2>Discover somewhere new</h2>
+        <p>No googling and no list of 400 trails to scroll on your walking app. Woden finds one walk for you, based on the day and its weather.</p></div>
+      <div class="mphone"><div class="phone"><i class="frame"></i><div class="screen"><img src="screens/today.webp" alt="Today's walk: Chanctonbury Ring, 1h 13 drive, 5.8 km walk." loading="lazy"></div></div></div>
     </section>
     <section class="step" data-i="2">
-      <div class="txt"><h2>A map you hardly need</h2>
-        <p>Black and white, north up, the hills shaded like an old Ordnance Survey map. Glance at it if you’re unsure. Otherwise follow the signs and look up.</p></div>
-      <div class="mphone"><div class="phone"><div class="screen shot"><img src="screens/walk.webp" alt="Walking: a black and white map, north up, hills shaded in grey, the route in black." loading="lazy" decoding="async"></div></div></div>
+      <div><h2>Google gets you there</h2>
+        <p>Woden sends the route to Google Maps and ends it at a free car park.</p></div>
+      <div class="mphone"><div class="phone"><i class="frame"></i><div class="screen"><img src="screens/carpark.webp" alt="At the car park: You're here, the loop on a grey map with hills shaded, Start walk." loading="lazy"></div></div></div>
     </section>
     <section class="step" data-i="3">
-      <div class="txt"><h2>Keep the day</h2>
-        <p>No questions at the end, no photos to upload. You get one picture of your day: the drive and the walk as a single line, coloured by the weather on the walk. Cold days come out blue, warm days gold, wet days darker.</p></div>
-      <div class="mphone"><div class="phone"><div class="screen shot"><img src="screens/done.webp" alt="Done: the day's drive and walk as one white line on a mild, clear day's colour." loading="lazy" decoding="async"></div></div></div>
+      <div><h2>Maps you hardly need</h2>
+        <p>Once you’re walking, the map turns with you, so the way ahead is always up. It’s black and white, with the hills shaded like an old Ordnance Survey map. Glance at it if you’re unsure. Otherwise follow the signs and look up.</p></div>
+      <div class="mphone"><div class="phone"><i class="frame"></i><div class="screen"><img src="screens/walk.webp" alt="Walking: a black and white map turned to the way you’re going, hills shaded in grey, the route in black." loading="lazy"></div></div></div>
+    </section>
+    <section class="step" data-i="4">
+      <div><h2>Keep the day</h2>
+        <p>No questions at the end, just one picture of your day: the drive and the walk as a single line. Its colour comes from the weather on the walk. Cold days come out blue, warm days gold, and cloud or rain makes it darker. Keep it as a wallpaper, then head home or let Woden pick a pub nearby.</p></div>
+      <div class="mphone"><div class="phone"><i class="frame"></i><div class="screen walls" role="img" aria-label="Five days as single white lines, each on its weather colour: blue for cold, gold for warm, darker for cloud and rain."><img src="screens/line-0.webp" alt=""><img src="screens/line-1.webp" alt=""><img src="screens/line-2.webp" alt=""><img src="screens/line-3.webp" alt=""><img src="screens/line-4.webp" alt=""></div></div></div>
+    </section>
+    <section class="step fin" data-i="-1">
+      <div><h2>Drive. Walk.<br>Rest.</h2>
+        <p>Woden’s a concept for now. If you would use it, or wouldn’t, I would love to hear why.</p>
+        <a class="btn" href="mailto:tony@gandalondon.com?subject=Woden">Tell me what you think</a></div>
     </section>
   </div>
-  <div class="park" aria-hidden="true"><div class="phone p3"><i class="slab" style="--k:12"></i><i class="slab" style="--k:11"></i><i class="slab" style="--k:10"></i><i class="slab" style="--k:9"></i><i class="slab" style="--k:8"></i><i class="slab" style="--k:7"></i><i class="slab" style="--k:6"></i><i class="slab" style="--k:5"></i><i class="slab" style="--k:4"></i><i class="slab" style="--k:3"></i><i class="slab" style="--k:2"></i><i class="slab rim" style="--k:1"></i><div class="screen shot" data-i="-1"><img src="screens/wall-0.webp" alt="A finished walk: the drive and the Chanctonbury loop as one white line on blue, a cold clear day." decoding="async"></div><div class="screen shot" data-i="0"><img src="screens/set.webp" alt="Set it once: Home SW20, drive up to 1h 15, walk 2 to 3 hours, quiet over busy." loading="lazy" decoding="async"></div><div class="screen shot" data-i="1"><img src="screens/today.webp" alt="Today's walk: Chanctonbury Ring, 1h 13 drive, no single-track lanes, 5.8 km walk." loading="lazy" decoding="async"></div><div class="screen shot" data-i="2"><img src="screens/walk.webp" alt="Walking: a black and white map, north up, hills shaded in grey, the route in black." loading="lazy" decoding="async"></div><div class="screen shot" data-i="3"><img src="screens/done.webp" alt="Done: the day's drive and walk as one white line on a mild, clear day's colour." loading="lazy" decoding="async"></div></div></div>
+  <div class="park" aria-hidden="true"><div class="phone" id="ph">
+    <i class="frame"></i>
+    <div class="screen walls on" data-i="-1"><img src="screens/line-0.webp" alt=""><img src="screens/line-1.webp" alt=""><img src="screens/line-2.webp" alt=""><img src="screens/line-3.webp" alt=""><img src="screens/line-4.webp" alt=""></div>
+    <div class="screen" data-i="0"><img src="screens/set.webp" alt=""></div>
+    <div class="screen" data-i="1"><img src="screens/today.webp" alt=""></div>
+    <div class="screen" data-i="2"><img src="screens/carpark.webp" alt=""></div>
+    <div class="screen" data-i="3"><img src="screens/walk.webp" alt=""></div>
+    <div class="screen walls" data-i="4"><img src="screens/line-0.webp" alt=""><img src="screens/line-1.webp" alt=""><img src="screens/line-2.webp" alt=""><img src="screens/line-3.webp" alt=""><img src="screens/line-4.webp" alt=""></div>
   </div></div>
-  <section class="finale"><div class="wrap">
-    <div class="ftxt"><h2 class="fin">Drive. Walk.
-Home.</h2><p class="fnote">Woden is a concept for now. If you would use it, or wouldn’t, I would love to hear why.</p><a class="btn" href="mailto:tony@gandalondon.com?subject=Woden">Tell me what you think</a></div>
-    <div class="fslot" aria-hidden="true"><div class="phone p3 fphone"><i class="slab" style="--k:12"></i><i class="slab" style="--k:11"></i><i class="slab" style="--k:10"></i><i class="slab" style="--k:9"></i><i class="slab" style="--k:8"></i><i class="slab" style="--k:7"></i><i class="slab" style="--k:6"></i><i class="slab" style="--k:5"></i><i class="slab" style="--k:4"></i><i class="slab" style="--k:3"></i><i class="slab" style="--k:2"></i><i class="slab rim" style="--k:1"></i><div class="screen walls" data-i="9"><img src="screens/wall-0.webp" alt="" loading="lazy" decoding="async"><img src="screens/wall-1.webp" alt="" loading="lazy" decoding="async"><img src="screens/wall-2.webp" alt="" loading="lazy" decoding="async"><img src="screens/wall-3.webp" alt="" loading="lazy" decoding="async"><img src="screens/wall-4.webp" alt="" loading="lazy" decoding="async"></div></div></div>
-  </div></section>
-</main>
-<div class="flyer" aria-hidden="true"><div class="phone p3"><i class="slab" style="--k:12"></i><i class="slab" style="--k:11"></i><i class="slab" style="--k:10"></i><i class="slab" style="--k:9"></i><i class="slab" style="--k:8"></i><i class="slab" style="--k:7"></i><i class="slab" style="--k:6"></i><i class="slab" style="--k:5"></i><i class="slab" style="--k:4"></i><i class="slab" style="--k:3"></i><i class="slab" style="--k:2"></i><i class="slab rim" style="--k:1"></i><div class="screen shot on" data-i="-1"><img src="screens/wall-0.webp" alt="A finished walk: the drive and the Chanctonbury loop as one white line on blue, a cold clear day." decoding="async"></div><div class="screen shot" data-i="0"><img src="screens/set.webp" alt="Set it once: Home SW20, drive up to 1h 15, walk 2 to 3 hours, quiet over busy." loading="lazy" decoding="async"></div><div class="screen shot" data-i="1"><img src="screens/today.webp" alt="Today's walk: Chanctonbury Ring, 1h 13 drive, no single-track lanes, 5.8 km walk." loading="lazy" decoding="async"></div><div class="screen shot" data-i="2"><img src="screens/walk.webp" alt="Walking: a black and white map, north up, hills shaded in grey, the route in black." loading="lazy" decoding="async"></div><div class="screen shot" data-i="3"><img src="screens/done.webp" alt="Done: the day's drive and walk as one white line on a mild, clear day's colour." loading="lazy" decoding="async"></div></div></div>
-<div class="lander" aria-hidden="true"><div class="phone p3"><i class="slab" style="--k:12"></i><i class="slab" style="--k:11"></i><i class="slab" style="--k:10"></i><i class="slab" style="--k:9"></i><i class="slab" style="--k:8"></i><i class="slab" style="--k:7"></i><i class="slab" style="--k:6"></i><i class="slab" style="--k:5"></i><i class="slab" style="--k:4"></i><i class="slab" style="--k:3"></i><i class="slab" style="--k:2"></i><i class="slab rim" style="--k:1"></i><div class="screen shot" data-i="-1"><img src="screens/wall-0.webp" alt="A finished walk: the drive and the Chanctonbury loop as one white line on blue, a cold clear day." decoding="async"></div><div class="screen shot" data-i="0"><img src="screens/set.webp" alt="Set it once: Home SW20, drive up to 1h 15, walk 2 to 3 hours, quiet over busy." loading="lazy" decoding="async"></div><div class="screen shot" data-i="1"><img src="screens/today.webp" alt="Today's walk: Chanctonbury Ring, 1h 13 drive, no single-track lanes, 5.8 km walk." loading="lazy" decoding="async"></div><div class="screen shot" data-i="2"><img src="screens/walk.webp" alt="Walking: a black and white map, north up, hills shaded in grey, the route in black." loading="lazy" decoding="async"></div><div class="screen shot" data-i="3"><img src="screens/done.webp" alt="Done: the day's drive and walk as one white line on a mild, clear day's colour." loading="lazy" decoding="async"></div><div class="screen walls" data-i="9"><img src="screens/wall-0.webp" alt="" loading="lazy" decoding="async"><img src="screens/wall-1.webp" alt="" loading="lazy" decoding="async"><img src="screens/wall-2.webp" alt="" loading="lazy" decoding="async"><img src="screens/wall-3.webp" alt="" loading="lazy" decoding="async"><img src="screens/wall-4.webp" alt="" loading="lazy" decoding="async"></div></div></div>
-<footer class="ftr">
-  <div class="wrap">
-    <div class="ftop">
-      <p class="credit">&copy; 2026 Woden, a concept by <a href="https://gandalondon.com" target="_blank" rel="noopener">Tony Goff-Yu</a>. Map data &copy; OpenStreetMap contributors. Contains OS data &copy; Crown copyright and database right 2026.</p>
-    </div>
-  </div>
-</footer>
-</div>
+</div></main>
+<footer class="ftr"><div class="wrap">
+  <p>&copy; 2026 Woden, a concept by <a href="https://gandalondon.com" target="_blank" rel="noopener" class="nw">Tony Goff-Yu</a>. Map data &copy; OpenStreetMap contributors. Contains OS data &copy; Crown copyright and database right 2026.</p>
+</div></footer>
 <script src="site.js"></script>
 <script>
-/* v5: fit the word; fly the phone from under the word to its parking spot; swap screens as the story scrolls */
+/* scroll: over the first 60% of a screen the wash fades out and the phone frame fades in round the art; then the screens follow the story */
 (function(){
-  var w=document.querySelector(".heyhero .word");
-  function fit(){}  /* stacked word: sized in CSS */
-  var fl=document.querySelector(".flyer"), fp=fl.querySelector(".p3"), dock=document.querySelector(".park"), dp=dock.querySelector(".p3"),
-      story=document.querySelector(".story"), site=document.querySelector(".site"), steps=[].slice.call(document.querySelectorAll(".step")),
-      mq=matchMedia("(max-width:900px)"), rm=matchMedia("(prefers-reduced-motion: reduce)"), G=null, q=false, cur=-1, root=document.documentElement;
-  var S={rx:22, ry:-34, rz:10, s:1};
-  var M={rx:22, ry:34, rz:-10};  /* the finale: the mirror of the opening angle */
-  var ld=document.querySelector(".lander"), lp=ld.querySelector(".p3"), fpn=document.querySelector(".fphone"), F=null;
-  var hr=new Date().getHours(), gw=hr<12?"Morning":hr<18?"Afternoon":"Evening";
-  /* starts angled, level with the top of the word (B2) */
-  function show(i){ if(i===cur) return; cur=i; [fp,dp].forEach(function(ph){ [].forEach.call(ph.querySelectorAll(".screen"),function(sc){ sc.classList.toggle("on", +sc.dataset.i===i); }); }); }
-  var ftr=document.querySelector(".ftr");
-  function measure(){
-    fit();
-    if(ftr) root.style.setProperty("--fh", ftr.offsetHeight+"px");
-    if(mq.matches){ G=null; F=null; root.classList.remove("parked","landing","fx"); return; }
-    var sr=site.getBoundingClientRect(), base=sr.top+scrollY, st=story.getBoundingClientRect().top+scrollY;
-    /* where the parked phone sits once the story column is stuck under the 88 px header */
-    dp.style.transform="none";
-    var dr=dp.getBoundingClientRect(), dk=dock.getBoundingClientRect(), oy=dr.top-dk.top, wr=w.getBoundingClientRect();
-    var E=Math.max(1, st-88), yEnd=88+oy, tx=dr.left-sr.left, hb=document.querySelector('.heyhero .wrap').getBoundingClientRect(), sy=hb.top-sr.top+hb.height/2-dr.height/2;
-    fl.style.width=dr.width+"px"; fp.style.width=dr.width+"px"; fl.style.left=tx+"px"; fl.style.top=sy+"px";
-    G={base:base, sy:sy, E:E, yEnd:yEnd};
-    /* finale: the parked phone stays where it is while the finale scrolls up to it, turning as it goes */
-    root.classList.toggle("fx", !rm.matches);
-    fpn.style.transform="none"; var fr=fpn.getBoundingClientRect(); fpn.style.transform="";
-    var sb=story.getBoundingClientRect().bottom+scrollY, S0=sb-innerHeight, fy=fr.top-sr.top, S1=Math.max(S0+1, base+fy-yEnd);
-    var fsc=fr.width/dr.width, ltop=fr.top-sr.top+(fr.height-dr.height)/2, lleft=fr.left-sr.left+(fr.width-dr.width)/2;
-    var maxS=Math.max(0,document.documentElement.scrollHeight-innerHeight);
-    fy=ltop; S1=Math.min(maxS, Math.max(S0+1, base+fy-yEnd));
-    ld.style.width=dr.width+"px"; lp.style.width=dr.width+"px"; ld.style.left=lleft+"px"; ld.style.top=fy+"px";
-    F={S0:S0, S1:S1, fy:fy, k:fsc, yT:base+fy-S1};
-    f();
-  }
+  var root=document.documentElement, steps=[].slice.call(document.querySelectorAll(".step")), ph=document.getElementById("ph"), fin=document.querySelector(".fin"), hero=document.querySelector(".hero"),
+      scr=[].slice.call(ph.querySelectorAll(".screen")), mq=matchMedia("(max-width:900px)"), cur=-1, q=false;
+  function show(i){ if(i===cur) return; cur=i; scr.forEach(function(s){ s.classList.toggle("on", +s.dataset.i===i); }); }
   function f(){ q=false;
-    var vh=innerHeight, mid=vh/2, best=0, bd=1e9;
-    steps.forEach(function(el,i){ var r=el.getBoundingClientRect(), d=Math.abs(r.top+r.height/2-mid); if(d<bd){ bd=d; best=i; } });
-    if(G && scrollY < G.E*0.6) best=-1;
+    var vh=innerHeight, m=mq.matches, h0=m ? Math.max(0,hero.offsetHeight-vh) : 0,
+        p=Math.max(0,Math.min(1,(scrollY-h0)/(vh*(m?.5:.6)))), e=p*p*(3-2*p);  /* phones: the fade starts once the whole hero has been seen */
+    /* the tail: as the finale comes up, the phone switches back to the coloured maps (no colour wash on the page) */
+    var ft=fin.getBoundingClientRect().top, r=Math.max(0,Math.min(1,(vh-ft)/(vh*.6))), t=r*r*(3-2*r);
+    if(m){ root.style.setProperty("--wash",(1-e).toFixed(3)); root.style.removeProperty("--frame"); root.classList.toggle("clear", e>.5); return; }
+    root.style.setProperty("--wash",(1-e).toFixed(3));
+    root.style.setProperty("--frame",e.toFixed(3));
+    root.classList.toggle("clear", e>.5);
+    var best=-1, bd=1e9, mid=vh/2;
+    if(scrollY>vh*.5 && t<.5) steps.forEach(function(el){ var r=el.getBoundingClientRect(), d=Math.abs(r.top+r.height/2-mid); if(d<bd){ bd=d; best=+el.dataset.i; } });
     show(best);
-    if(!G || rm.matches) return;
-    var s=scrollY, u=Math.max(0,Math.min(1,s/G.E)), e=u*u*(3-2*u), k=1-e, sc=S.s+(1-S.s)*e;
-    var land = F && s>=F.S0;
-    root.classList.toggle("parked", u>=1 && !land); root.classList.toggle("landing", !!land);
-    if(land){
-      var v=Math.max(0,Math.min(1,(s-F.S0)/(F.S1-F.S0))), m=v*v*(3-2*v);
-      ld.style.transform="translateY("+(s<F.S1 ? (G.yEnd*(1-m)+F.yT*m - (G.base+F.fy-s)) : 0).toFixed(1)+"px)";
-      lp.style.transform="rotateX("+(M.rx*m).toFixed(2)+"deg) rotateY("+(M.ry*m).toFixed(2)+"deg) rotateZ("+(M.rz*m).toFixed(2)+"deg) scale("+(1+(F.k-1)*m).toFixed(3)+")";
-      [].forEach.call(lp.querySelectorAll(".screen"),function(sc){ sc.classList.toggle("on", (sc.dataset.i==="9")===(v>.5)); });
-      return;
-    }
-    var T=((G.base+G.sy)*k + G.yEnd*e) - G.base - G.sy + s;
-    fl.style.transform="translateY("+T.toFixed(1)+"px)";
-    fp.style.transform=k<0.001 ? "none" : "rotateX("+(S.rx*k).toFixed(2)+"deg) rotateY("+(S.ry*k).toFixed(2)+"deg) rotateZ("+(S.rz*k).toFixed(2)+"deg) scale("+sc.toFixed(3)+")";
   }
   addEventListener("scroll",function(){ if(!q){ q=true; requestAnimationFrame(f); } },{passive:true});
-  addEventListener("resize",measure); mq.addEventListener("change",measure); rm.addEventListener("change",measure);
-  measure(); addEventListener("load",measure); if(document.fonts) document.fonts.ready.then(measure);
-  })();
+  addEventListener("resize",f); f();
+})();
 </script>
 </body>
 </html>
