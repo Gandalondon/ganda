@@ -90,7 +90,7 @@ html.clear .step .btn{background:var(--ink);color:#FFFFFF}
 .walls img:nth-child(3){animation-delay:calc(var(--cyc) * .36)}
 .walls img:nth-child(4){animation-delay:calc(var(--cyc) * .56)}
 .walls img:nth-child(5){animation-delay:calc(var(--cyc) * .76)}
-@keyframes wl{0%{opacity:0}4%,20%{opacity:1}24%,100%{opacity:0}}
+@keyframes wl{0%,2%{opacity:0}6%,18%{opacity:1}20%,100%{opacity:0}}  /* 21:35 no crossfade: each line is fully gone before the next starts, so no faint ghost of the last route */
 .mphone{display:none}
 .ftr{position:relative;z-index:1;padding:96px 0 calc(48px + env(safe-area-inset-bottom,0px));font-size:16px;line-height:24px}
 
