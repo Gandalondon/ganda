@@ -103,7 +103,10 @@ html.clear .step .btn{background:var(--ink);color:#FFFFFF}
   .hero{min-height:100svh;padding-top:calc(var(--hdr) + 48px)}
   .hero h1{font-size:calc((100vw - 2 * var(--edge)) / 6.3)}
   .hero .lede{margin-top:24px;font-size:21px;line-height:31px}
-  .hero .art{margin:40px auto 0;width:min(260px,60vw)}
+  /* phones (20:05): the route fills the space left under the lede, cropped to the route so there is no empty canvas above it */
+  .hero{justify-content:flex-start}
+  .hero .art{flex:1 1 0;min-height:200px;max-height:440px;width:100%;margin:32px 0 0;aspect-ratio:auto}
+  .hero .art img{inset:auto;left:50%;top:50%;width:140.3%;height:189.6%;transform:translate(-50%,-50%);object-fit:contain}  /* the route is the middle 71% x 53% of each picture: this makes that part fit the box */
   .step,.step.fin{min-height:0;display:block;padding-block:64px}
   .step.fin h2{font-size:9.6vw}
   .mphone{display:flex;justify-content:center;margin-top:56px}
