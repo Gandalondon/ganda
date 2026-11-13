@@ -9,11 +9,13 @@
 <title>Woden</title>
 <meta name="description" content="Choosing a walk shouldn't take longer than the walk. Woden picks one you've never done, so all you have to do is go.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2072%2072'%3E%3Ccircle%20cx='36'%20cy='36'%20r='36'%20fill='%231A1A1A'/%3E%3Cg%20transform='translate(12.0%2021.4)%20scale(0.1169)'%3E%3Cpath%20fill='%23FFFFFF'%20d='M208.98%20167.00%20L276.09%20249.00%20L338.72%20249.00%20L404.39%2065.60%20L347.88%2065.60%20L301.27%20195.76%20L243.36%20125.00%20L174.61%20125.00%20L117.92%20194.25%20L55.86%200.00%20L0.00%200.00%20L79.56%20249.00%20L141.87%20249.00%20Z'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preload" href="fonts/zalando-sans-expanded-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/inter-latin-opsz-wght.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 /* Woden concept page, version B (13 Nov): the day's colours fill the whole hero, the line art sits where the phone will be.
    On scroll the colour drains away and a front-on phone frame appears round the art. No angled phone. */
-@font-face{font-family:"Inter";font-weight:100 900;font-display:swap;src:url(fonts/inter-latin-opsz-wght.woff2) format("woff2-variations"),url(fonts/inter-latin-opsz-wght.woff2) format("woff2")}
-@font-face{font-family:"Zalando Sans Expanded";font-weight:200 900;font-display:swap;src:url(fonts/zalando-sans-expanded-latin-wght.woff2) format("woff2-variations"),url(fonts/zalando-sans-expanded-latin-wght.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:100 900;font-display:block;src:url(fonts/inter-latin-opsz-wght.woff2) format("woff2-variations"),url(fonts/inter-latin-opsz-wght.woff2) format("woff2")}
+@font-face{font-family:"Zalando Sans Expanded";font-weight:200 900;font-display:block;src:url(fonts/zalando-sans-expanded-latin-wght.woff2) format("woff2-variations"),url(fonts/zalando-sans-expanded-latin-wght.woff2) format("woff2")}
 :root{
   --ink:#1A1A1A; --bg:#FFFFFF;
   --font:"Inter","Helvetica Neue",Arial,system-ui,sans-serif;
@@ -161,7 +163,7 @@ html.clear .step .btn{background:var(--ink);color:#FFFFFF}
     <section class="step" data-i="4">
       <div><h2>Keep the day</h2>
         <p>No questions at the end, just one picture of your day: the drive and the walk as a single line. Its colour comes from the weather on the walk. Cold days come out blue, warm days gold, and cloud or rain makes it darker. Keep it as a wallpaper, then head home or let Woden pick a pub nearby.</p></div>
-      <div class="mphone"><div class="phone"><i class="frame"></i><div class="screen walls" role="img" aria-label="Five days as single white lines, each on its weather colour: blue for cold, gold for warm, darker for cloud and rain."><img src="screens/line-0.webp" alt=""><img src="screens/line-1.webp" alt=""><img src="screens/line-2.webp" alt=""><img src="screens/line-3.webp" alt=""><img src="screens/line-4.webp" alt=""></div></div></div>
+      <div class="mphone"><div class="phone"><i class="frame"></i><div class="screen"><img src="screens/walks.webp" alt="Your walks: four days, each a white line on its weather colour, from cold blue to warm gold." loading="lazy"></div></div></div>
     </section>
     <section class="step fin" data-i="-1">
       <div><h2>Drive. Walk.<br>Rest.</h2>
@@ -176,7 +178,7 @@ html.clear .step .btn{background:var(--ink);color:#FFFFFF}
     <div class="screen" data-i="1"><img src="screens/today.webp" alt=""></div>
     <div class="screen" data-i="2"><img src="screens/carpark.webp" alt=""></div>
     <div class="screen" data-i="3"><img src="screens/walk.webp" alt=""></div>
-    <div class="screen walls" data-i="4"><img src="screens/line-0.webp" alt=""><img src="screens/line-1.webp" alt=""><img src="screens/line-2.webp" alt=""><img src="screens/line-3.webp" alt=""><img src="screens/line-4.webp" alt=""></div>
+    <div class="screen" data-i="4"><img src="screens/walks.webp" alt=""></div>
   </div></div>
 </div></main>
 <footer class="ftr"><div class="wrap">
