@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getWorkProjects } from "@/lib/storyblok";
 
-const BASE = "https://gandalondon.com";
+const BASE = "https://www.gandalondon.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const projects = await getWorkProjects().catch(() => []);

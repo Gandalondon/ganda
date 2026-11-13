@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-export const SITE_URL = "https://gandalondon.com";
+export const SITE_URL = "https://www.gandalondon.com";
 export const SITE_NAME = "Ganda";
 export const SHARE_IMAGE = "/opengraph-image.png";
 
@@ -68,6 +68,8 @@ export const HOME_JSON_LD = {
       name: "Tony Goff-Yu",
       url: SITE_URL,
       jobTitle: "Product Designer",
+      description:
+        "London-based product designer with 20+ years' experience in automotive, e-commerce, experimentation and customer experience.",
       worksFor: { "@type": "Organization", name: "Ganda", url: SITE_URL },
       address: { "@type": "PostalAddress", addressLocality: "London" },
       knowsAbout: [

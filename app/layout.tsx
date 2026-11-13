@@ -17,11 +17,11 @@ const dmSans = DM_Sans({ subsets: ["latin"], weight: ["300", "400", "500", "600"
 export const metadata: Metadata = {
   title: "Ganda | Tony Goff-Yu, Product Designer",
   description: SITE_DESCRIPTION,
-  metadataBase: new URL("https://gandalondon.com"),
+  metadataBase: new URL("https://www.gandalondon.com"),
   openGraph: {
     title: "Ganda | Tony Goff-Yu, Product Designer",
     description: SITE_DESCRIPTION,
-    url: "https://gandalondon.com",
+    url: "https://www.gandalondon.com",
     siteName: "Ganda",
     locale: "en_GB",
     type: "website",
