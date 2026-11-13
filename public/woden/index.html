@@ -41,7 +41,8 @@ p{margin:0;text-wrap:pretty}
 .btn.sm{height:40px;padding:0 20px;font-size:16px}
 
 /* the weather wash: the day's colour, full window, cycling with the art (same timing, so the edges never show) */
-.wash{position:fixed;inset:0;z-index:0;pointer-events:none;background:#4A789F;animation:wash var(--cyc) linear infinite;opacity:var(--wash,1)}
+.wash{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;z-index:0;  /* 20:17 lvh: as tall as the screen with the address bar hidden, so no white strip when it slides away on phones */
+  pointer-events:none;background:#4A789F;animation:wash var(--cyc) linear infinite;opacity:var(--wash,1)}
 @keyframes wash{
   0%,16%{background:#4A789F} 20%,36%{background:#C08021} 40%,56%{background:#616461} 60%,76%{background:#B7935B} 80%,96%{background:#8B7A62} 100%{background:#4A789F}
 }
@@ -157,7 +158,7 @@ html.clear .step .btn{background:var(--ink);color:#FFFFFF}
     </section>
     <section class="step" data-i="3">
       <div><h2>Maps you hardly need</h2>
-        <p>Once you’re walking, the map turns with you, so the way ahead is always up. It’s black and white, with the hills shaded like an old Ordnance Survey map. Glance at it if you’re unsure. Otherwise follow the signs and look up.</p></div>
+        <p>Once you’re walking, the map turns with you, so the way ahead is always up. It’s black and white, with the hills shaded the way Ordnance Survey used to. Glance at it if you’re unsure. Otherwise follow the signs and look up.</p></div>
       <div class="mphone"><div class="phone"><i class="frame"></i><div class="screen"><img src="screens/walk.webp" alt="Walking: a black and white map turned to the way you’re going, hills shaded in grey, the route in black." loading="lazy"></div></div></div>
     </section>
     <section class="step" data-i="4">
