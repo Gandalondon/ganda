@@ -1,0 +1,265 @@
+@font-face{font-family:"Albert Sans";font-weight:400;font-display:swap;src:url(fonts/albert-sans-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Albert Sans";font-weight:600;font-display:swap;src:url(fonts/albert-sans-latin-600-normal.woff2) format("woff2")}
+/* Relay site. Inter Tight throughout. One charcoal ground with faint contour lines behind the whole page, fixed while you scroll.
+   Hierarchy comes from size, weight and space. No divider lines or borders, except the hairline round the Share page's trailer still (Tony, 8 Nov). 8px grid. */
+:root{
+  /* Tracking scale (6 Nov): set once, never per element. Inter Tight is spaced for headlines, so smaller sizes open up. */
+  --tr-display:-.025em;  /* H1, hero words, phone-screen headlines */
+  --tr-h2:0;            /* section headings */
+  --tr-h3:.01em;        /* small headings */
+  --tr-text:0;      /* body, buttons, nav */
+  --tr-caps:.04em;      /* RELAY wordmark */
+  --tr-nav:.04em;       /* header nav and header button: cream semibold on charcoal reads tighter than the same type on amber (Tony, 10 Nov) */
+  --bg:#FFFFFF;        /* charcoal base: hero, footer, pages */
+  --panel:#F0F0EE;     /* raised surface: form fields */
+  --map:#26282D;       /* map surface in the mockups: neutral, no blue */
+  --ink:#FFFFFF;
+  --amber:#1E1E1C; --amber-hi:#3A3A37;
+  --text-hi:#1E1E1C;   /* headings: warm off-white */
+  --text:#1E1E1C;      /* body: the same off-white as headings. Three colours only: off-white, blue-black, yellow */
+  --text-meta:#1E1E1C; /* no grey: small print uses the off-white too */
+  --contour:#FFFFFF;
+  /* symbol on the site: yellow bars, cream wordmark */
+  --sym-1:#F2B33D; --sym-2:#F2B33D; --sym-3:#F2B33D;
+  --font:"Albert Sans","Helvetica Neue",Arial,system-ui,sans-serif;
+  /* type scale (5 Nov): the site uses these sizes only. Display words (Hey Relay, Ask. Find. / Get out.) are fitted to the window. */
+  --h1:clamp(56px,8vw,112px);   /* page titles, 700, line .92 */
+  --h2:clamp(40px,4.6vw,64px);  /* section headings, 600, line 1 */
+  --h3:24px; --h3-lh:30px;      /* small headings and labels over lists: 600 at +1% (5 Nov; 500 read too thin next to the 600 headings) */
+  --lede:24px; --lede-lh:34px;  /* intro line under a title */
+  --body:18px; --body-lh:28px;  /* everything you read */
+  --small:16px; --small-lh:24px;/* footer, small buttons, field labels */
+  --edge:max(24px,env(safe-area-inset-left,0px)); --edge-r:max(24px,env(safe-area-inset-right,0px));
+  color-scheme:light;
+}
+@media (max-width:600px){ :root{ --h3:22px; --h3-lh:28px; --lede:21px; --lede-lh:31px } }
+@media (min-width:1024px){ :root{ --edge:64px; --edge-r:64px } }
+@media (min-width:1440px){ :root{ --edge:80px; --edge-r:80px } }
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 18px/28px var(--font);letter-spacing:var(--tr-text);overflow-x:hidden}  /* body copy: +2% (Inter Tight is tight at reading sizes) */
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-family:var(--font);margin:0;color:var(--text-hi);text-wrap:balance;letter-spacing:var(--tr-h3)}  /* headings keep their own tracking; small ones +1% */
+p{margin:0;text-wrap:pretty}
+.wrap{max-width:none;margin:0 auto;padding-left:var(--edge);padding-right:var(--edge-r)}  /* every page runs to the same gutters as the homepage (5 Nov) */
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+
+/* buttons: pills, sentence case */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:56px;padding:0 32px;border:0;border-radius:999px;background:var(--amber);color:var(--ink);font:600 18px/1 var(--font);letter-spacing:var(--tr-text);white-space:nowrap;cursor:pointer;transition:background .2s ease}
+.btn:hover{background:var(--amber-hi)}
+.btn.soon,.btn.soon:hover{background:var(--amber);cursor:default}  /* amber like every button, but not a link until open testing (7 Nov) */
+.btn.sm{height:44px;padding:0 20px;font-size:16px}
+
+/* header: a solid charcoal bar fixed to the top on every page, the full lockup (mark and RELAY, back 8 Nov). It never changes colour. */
+.hdr{position:fixed;inset:0 0 auto;z-index:20;background:var(--bg);padding-top:env(safe-area-inset-top,0px)}
+.hdr .btn.sm{height:40px;padding:0 20px;font-size:16px;letter-spacing:var(--tr-nav)}
+@media (max-width:600px){ .hdr .btn.sm{height:36px;padding:0 16px} }
+/* the header runs to the page's outer margins, wider than the content column: logo far left, Get the app far right */
+.hdr .wrap{max-width:none;height:88px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+/* logo: the three signal lines + wordmark (the wordmark stays in capitals). Draws in once on load, then stays still. */
+.logo{display:inline-flex;align-items:center;color:var(--text-hi)}
+.logo svg{flex:none;width:32px;height:32px;display:block;overflow:hidden}
+.logo path{fill:currentColor;stroke:none}
+.logo mask .trace{fill:none;stroke:#FFFFFF;stroke-width:96;stroke-linejoin:round;stroke-linecap:butt}
+.logo .name .arc{font-weight:400;color:var(--text-hi)}
+.logo .name .rl{color:var(--amber)}
+/* folio lockup proportions (8 Nov): the drawn lines fill 65 of the mark's 72 units, so with V the visible mark,
+   caps are 0.58 V tall (font 0.866 V), centred on the lines, and the gap is 0.52 V. RELAY is never smaller than the header links. */
+.logo{--mk:32px}
+.logo svg{width:var(--mk);height:var(--mk);transform:translateY(calc(var(--mk) * -3.5 / 72))}
+.logo .name{display:block;white-space:nowrap;padding-left:calc(var(--mk) * (.52 * 65 - 7) / 72);font:700 calc(var(--mk) * .866 * 65 / 72)/1 var(--font);letter-spacing:-.02em}
+@media (max-width:600px){ .logo{--mk:22px} }
+/* narrow phones: RELAY stays at 16 px (the links' size, never smaller); gaps tighten so Coming soon keeps to the gutter */
+@media (max-width:400px){ .logo{--mk:20.5px} .hright{gap:16px} .hdr .wrap{gap:12px} .hdr .btn.sm{padding:0 14px} }
+/* under 390 px the full lockup and both links no longer fit inside the gutters: mark only, as before 8 Nov (the name stays for screen readers) */
+@media (max-width:389px){ .logo{--mk:28px} .hdr .logo .name{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);padding:0} }
+
+/* contours: decorative terrain in the hero and footer, one colour, one line weight */
+canvas.topo{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.site{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;flex-direction:column}
+.site > main{flex:1 0 auto}  /* short pages (Feedback): the footer sits at the bottom of the window, not under the last line (Tony, 8 Nov) */
+
+/* hero */
+/* hero: headline, line and button on the left; the phone, angled, on the right as the main visual */
+/* hero: fills the window below the header, text and phone centred in it together */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding-block:calc(104px + env(safe-area-inset-top,0px)) 56px}
+.hero .wrap{width:100%;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:48px;align-items:center}
+.hero h1{margin-left:-.03em;font-size:clamp(64px,8.6vw,136px);line-height:.92;font-weight:700;letter-spacing:var(--tr-display);text-wrap:initial}
+.a{color:var(--amber)}
+.hero .lede{margin-top:40px;font-size:24px;line-height:34px;max-width:26em;color:var(--text)}
+.hero .btn{margin-top:40px}
+.hero .phone-col{justify-self:center}
+@media (max-width:900px){ .hero{min-height:0;display:block;padding-block:calc(128px + env(safe-area-inset-top,0px)) 72px} .phone.hero-phone{--pw:min(340px,78vw)} .hero .wrap{grid-template-columns:minmax(0,1fr);gap:72px} .hero .lede{margin-top:32px;font-size:21px;line-height:31px} .hero .btn{margin-top:32px} }
+@media (max-width:600px){ .hero h1{font-size:17vw} }
+
+/* phone mockups: the real app's screens at 390 wide, scaled with em */
+/* every phone: upright, with a frame that has a faint metal edge. No drop shadow, no 3D. */
+.phone{--pw:300px;width:var(--pw);max-width:100%;aspect-ratio:390/844;padding:calc(var(--pw) * .028);border-radius:calc(var(--pw) * .1467);background:linear-gradient(140deg,#3F4249,#2A2C32 45%,#222429);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+/* the phone is sized to fit the window's height, so it never pushes the hero below the fold */
+.phone.hero-phone{--pw:min(340px,78vw,calc((100svh - 200px) * 0.462))}
+.screen{position:relative;width:100%;height:100%;border-radius:calc(var(--pw) * .1133);overflow:hidden;font-size:calc(var(--pw) * .9333 / 24.375);padding:2.25em 1.125em 0;  /* sides about half the old 24px; more at the top to clear the corner curve. Scales with the phone */display:flex;flex-direction:column;background:var(--bg);color:var(--text-hi);font-family:var(--font)}
+.screen.amber{background:var(--amber);color:var(--ink)}
+.screen .top{display:flex;justify-content:space-between;align-items:flex-start;gap:1em}
+.screen .w{font:600 5em/.95 var(--font);letter-spacing:var(--tr-display);white-space:pre-line}
+.screen .ins{font:600 3em/1.02 var(--font);letter-spacing:var(--tr-display);text-wrap:balance;flex:1 1 auto}
+.screen .greet{font:600 4em/1 var(--font);letter-spacing:var(--tr-display);white-space:pre-line;text-wrap:balance}
+.screen .ctx{font-size:1em;line-height:1.5;color:var(--text-meta);margin-top:1em}
+.screen .x{flex:none;width:20px;height:20px;margin:2px 0 0;color:var(--amber)}
+.screen.amber .x{color:var(--ink)}
+.screen .fill{flex:1 1 auto}
+.screen .map{flex:1 1 auto;min-height:0;position:relative;overflow:hidden;margin:1.5em 0 1.5em;border-radius:1em;background:var(--map);isolation:isolate}  /* inset tile, as in the app (4 Nov) */
+.screen .mctl{position:absolute;right:.75em;top:.75em;z-index:1000;display:flex;flex-direction:column;gap:.5em}
+.screen .mctl i{width:2.75em;height:2.75em;border-radius:50%;background:var(--amber);color:var(--ink);display:flex;align-items:center;justify-content:center;box-shadow:0 .125em .5em rgba(21,23,28,.45)}
+.screen .mctl svg{width:1.5em;height:1.5em}
+.screen .mctl i.on{background:var(--ink);color:var(--amber);box-shadow:inset 0 0 0 .125em var(--amber),0 .125em .5em rgba(21,23,28,.45)}
+.screen .mok{position:absolute;left:50%;bottom:1em;transform:translateX(-50%);z-index:1000;height:3em;padding:0 1.5em;border-radius:999px;background:var(--amber);color:var(--ink);font:600 1em/3em var(--font);white-space:nowrap;box-shadow:0 .125em .75em rgba(21,23,28,.5)}
+.pinlab{font:600 12px/14px var(--font);color:#EEE8DC;white-space:nowrap;transform:translate(16px,-50%);text-shadow:0 0 3px #1C1E22,0 0 6px #1C1E22;pointer-events:none}
+
+.screen .map > svg{position:absolute;inset:0;width:100%;height:100%;display:block}  /* only the drawn stand-in map, never the map's own route layer */
+/* real map in the mockups (private concept) */
+.lmap{position:absolute;inset:0;background:#23262C}
+.lmap .leaflet-control-attribution{background:rgba(28,30,34,.72)!important;color:#8A93A3!important;font:400 9px/14px var(--font);padding:0 6px}
+.lmap .leaflet-control-attribution a{color:#EEE8DC!important}
+.screen .dock{flex:none;height:7em;display:flex;align-items:center;justify-content:center}
+.screen.session .dock{height:6.5em}
+.screen .mic{box-sizing:border-box;color:var(--ink);background:var(--amber);border-radius:50%;width:4.5em;height:4.5em;padding:1.125em}  /* the app's filled mic */
+
+.wave{display:flex;align-items:center;justify-content:center;gap:.5625em;height:5.5em;color:var(--amber)}
+.wave i{display:block;width:1.125em;height:100%;border-radius:999px;background:currentColor;animation:wv 1s ease-in-out infinite}
+.wave i:nth-child(1),.wave i:nth-child(5){height:42%}
+.wave i:nth-child(2),.wave i:nth-child(4){height:70%}
+.wave i:nth-child(1){animation-delay:-.45s}.wave i:nth-child(2){animation-delay:-.15s}.wave i:nth-child(3){animation-delay:-.3s}.wave i:nth-child(4){animation-delay:-.6s}.wave i:nth-child(5){animation-delay:-.75s}
+@keyframes wv{0%,100%{transform:scaleY(.6)}50%{transform:scaleY(1)}}
+@media (max-width:420px){ .phone{--pw:280px} }
+
+/* product rows: one deeper band, so the hero and footer read as the frame */
+.rows{padding-block:64px}
+.feature{padding-block:96px}
+.feature .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:96px;align-items:center}
+.feature.flip .phone-col{order:2}
+.feature .phone-col{justify-self:center}
+.feature h2{font-size:var(--h2);line-height:1;font-weight:600;letter-spacing:var(--tr-h2)}
+.feature p{margin-top:24px;max-width:26em;font-size:var(--body);line-height:var(--body-lh);color:var(--text)}
+.feature .btn{margin-top:40px}
+@media (max-width:900px){ .rows{padding-block:32px} .feature{padding-block:64px} .feature .wrap{grid-template-columns:minmax(0,1fr);gap:56px} .feature .phone-col,.feature.flip .phone-col{order:2} .feature .btn{margin-top:32px} }
+
+/* footer: the logo again, giant, drawing in from the left edge and running off the bottom of the page. Links stacked on the right. */
+/* footer: one line. The credit on the left, the links on the right, all off-white. Same outer margins as the header. */
+.ftr{position:relative;padding-top:160px}
+.page + .ftr{padding-top:80px}
+.ftr .wrap{max-width:none}
+.ftop{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px 32px;padding-bottom:calc(48px + env(safe-area-inset-bottom,0px));font-size:16px;line-height:24px;color:var(--text-hi)}
+.ftop nav{display:flex;flex-wrap:wrap;gap:8px 32px}
+.ftop a{color:var(--text-hi);white-space:nowrap;transition:color .25s ease}
+.ftop a:hover,.ftop nav a[aria-current="page"]{color:var(--amber)}
+@media (max-width:600px){ .ftr{padding-top:112px} .ftop{flex-direction:column;align-items:flex-start;gap:24px} .ftop nav{flex-direction:column;gap:12px} .ftop .credit{order:2} }
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* inner pages: one reading column, intro the same width */
+.page{padding-block:calc(160px + env(safe-area-inset-top,0px)) 144px}
+.page .col{max-width:720px}
+.page h1{font-size:var(--h1);line-height:.92;font-weight:700;letter-spacing:var(--tr-display)}
+.page .intro{font-size:var(--lede);line-height:var(--lede-lh);margin-top:40px;color:var(--text)}
+.prose{margin-top:80px;display:flex;flex-direction:column;gap:64px}
+.prose section{display:flex;flex-direction:column;gap:16px}
+.prose a{color:var(--text-hi);text-decoration:none;font-weight:500}  /* links and button text: 500 (5 Nov) */
+.prose h2{font-size:var(--h3);line-height:var(--h3-lh);font-weight:600;letter-spacing:var(--tr-h3)}
+.muted{color:var(--text-meta)}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:16px 24px}
+.kv div:nth-child(odd){font-weight:500;color:var(--text-hi)}
+@media (max-width:600px){ .kv{grid-template-columns:minmax(0,1fr);gap:4px} .kv div:nth-child(odd):not(:first-child){margin-top:16px} }
+
+/* feedback (7 Nov): an email link, not a form. The form could not send (ImprovMX refuses Brevo mail). */
+.fb{margin-top:40px;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.fblink{color:var(--amber);font-size:var(--lede);line-height:var(--lede-lh);font-weight:500;overflow-wrap:anywhere;transition:color .2s ease}  /* feedback: amber text link, no underline, no button (7 Nov) */
+.fblink:hover{color:var(--amber-hi)}
+
+/* fade-ins, from Sniff: each block rises 8px and fades in once, as a unit */
+.rv .reveal{opacity:0;transform:translateY(8px);transition:opacity .6s ease-out,transform .6s ease-out}
+.rv .reveal.in{opacity:1;transform:none}
+.rv .reveal.now{transition:none}
+@media (prefers-reduced-motion:reduce){ .rv .reveal{opacity:1;transform:none;transition:none} .wave i{animation:none} canvas.topo{transform:none!important} }
+
+/* PHOTO HERO (exploration): the living-room photo runs edge to edge behind the hero, the phone is in the photo.
+   The copy sits on the left, centred in the window. The photo fades into plain charcoal; no contour lines on this version. */
+canvas.topo{display:none}
+.hero.photo{position:relative;overflow:hidden;background:var(--bg);padding-block:calc(88px + env(safe-area-inset-top,0px)) 88px}
+.hero.photo .hero-img{position:absolute;inset:0;z-index:0;overflow:hidden}
+/* the photo is drawn a little larger than the hero and pushed up; the phone sits a little in from the right (4 Nov) */
+.hero.photo .hero-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:72% 50%;display:block}  /* 5 Nov top-down photo: already framed with room on the left, so no zoom */
+.hero.photo::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg,rgba(28,30,34,.78) 0%,rgba(28,30,34,.4) 36%,rgba(28,30,34,0) 58%),linear-gradient(180deg,rgba(28,30,34,0) 55%,rgba(28,30,34,.7) 82%,var(--bg) 100%)}
+.hero.photo .wrap{position:relative;z-index:1;display:block;max-width:none;margin-top:-6svh}  /* lined up with the logo, a touch above centre */
+.hero.photo .wrap > div{max-width:min(720px,46vw)}
+.hero.photo h1{font-size:clamp(64px,8.6vw,136px)}
+.hero.photo .lede{max-width:22em}
+@media (max-width:900px){
+  .hero.photo{padding-top:calc(152px + env(safe-area-inset-top,0px));padding-bottom:0;display:flex;flex-direction:column}  /* clear of the logo, like the original */
+  .hero.photo .wrap > div,.hero.photo .lede{max-width:none}  /* full width on phones */
+  .hero.photo h1{font-size:17vw}
+  .hero.photo .wrap{order:1;margin-top:0}
+  .hero.photo .hero-img{order:2;position:relative;inset:auto;display:block;margin-top:40px;aspect-ratio:1/1}
+  .hero.photo .hero-img img{position:static;width:100%;height:100%;object-position:100% 50%}  /* the phone sits in the middle of the square crop */
+  .hero.photo::after{display:none}
+  .hero.photo .hero-img::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,var(--bg) 0%,rgba(28,30,34,0) 20%,rgba(28,30,34,0) 70%,var(--bg) 100%)}
+}
+
+/* real app captures (4 Nov 2026): the screen is a picture of the app, so it always matches */
+.screen.shot{padding:0;display:block}
+.screen.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+
+/* how it works (5 Nov): Sniff's pattern. Section title on the left, icon rows on the right; one column on phones. */
+.hright{display:flex;align-items:center;gap:32px}
+.topnav{font:600 18px/1 var(--font);letter-spacing:var(--tr-nav);color:var(--text-hi);white-space:nowrap;transition:color .25s ease}
+.topnav:hover,.topnav[aria-current="page"]{color:var(--amber)}
+@media (max-width:520px){ .hright{gap:20px} .topnav{font-size:16px} }
+.hsec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px 64px;margin-top:120px}  /* two equal halves: section title on the left, content from the middle to the right gutter (5 Nov, Tony's reference) */
+.hsec h2{font-size:var(--h2);line-height:1;font-weight:600;letter-spacing:var(--tr-h2)}
+.hlist{display:flex;flex-direction:column;gap:48px;min-width:0}
+.how{display:grid;grid-template-columns:48px minmax(0,1fr);gap:20px;align-items:start}
+.how .ico{width:48px;height:48px;border-radius:50%;background:var(--amber);color:var(--ink);display:flex;align-items:center;justify-content:center}
+.how .ic{width:26px;height:26px;display:block}
+.how h3{font-size:var(--h3);line-height:var(--h3-lh);font-weight:600;margin-top:8px}
+.how p{margin-top:10px;max-width:42em}
+.hnote{max-width:34em}
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 48px;margin-top:40px}
+.pgrid:first-child{margin-top:0}  /* no intro line above it: line up with the section title */
+.pcol{display:flex;flex-direction:column;gap:40px;min-width:0}  /* each column stacks on its own, so a short group doesn't leave a gap under it (7 Nov) */
+.pgroup h3{font-size:var(--h3);line-height:var(--h3-lh);font-weight:600;color:var(--text-hi)}
+.pgroup ul{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.pgroup li{font:400 var(--body)/var(--body-lh) var(--font);color:var(--text);text-wrap:pretty}  /* same as body text */
+.prosebit{gap:20px}
+.prosebit a{color:var(--text-hi);font-weight:500}
+@media (max-width:900px){ .hsec{grid-template-columns:minmax(0,1fr);margin-top:88px} }
+@media (max-width:600px){ .pcol{display:contents} .pgrid{grid-template-columns:minmax(0,1fr);gap:32px} .how{grid-template-columns:40px minmax(0,1fr);gap:16px} .how .ico{width:40px;height:40px} .how .ic{width:22px;height:22px} .how h3{margin-top:5px} }
+@media (max-width:900px){ .hdr .wrap{height:72px} }
+
+/* share page (8 Nov, draft): same two-half grid as How it works */
+.sharebody{display:flex;flex-direction:column;gap:20px;min-width:0}
+.yt{position:relative;display:block;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--panel)}  /* a still of the trailer that opens it on YouTube in a new tab (Sniff's pattern, 8 Nov): no embed, nothing loads from YouTube */
+.yt img{display:block;width:100%;height:100%;object-fit:cover}
+.yt::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(238,232,220,.16);pointer-events:none}  /* hairline: the trailer's charcoal matches the page, so it needs an edge */
+.ytplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:clamp(48px,9%,72px);aspect-ratio:1;border-radius:50%;background:var(--amber);color:var(--bg);display:grid;place-items:center}  /* Relay's talk-button yellow; no hover motion */
+.ytplay svg{width:50%;height:50%}
+.yt:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.yt + .hnote{margin-top:-8px}
+.sharelink{font:600 var(--h3)/var(--h3-lh) var(--font);color:var(--text-hi)}
+.sharebtns{display:flex;gap:12px;flex-wrap:wrap}
+.btn.ghost{background:transparent;color:var(--text-hi);box-shadow:inset 0 0 0 2px var(--text-hi)}
+.btn.ghost:hover{background:var(--panel)}
+.blurb h3{font-size:var(--h3);line-height:var(--h3-lh);font-weight:600}
+.blurb p{margin:10px 0 20px;max-width:42em;text-wrap:pretty}
+.how p a,.hnote a{color:var(--amber)}
+.hnote a[download]{white-space:nowrap}  /* Download MP4 never splits */
+.hnote.small{font-size:var(--small);line-height:var(--small-lh);color:var(--text-meta)}
+.hnote{text-wrap:pretty}
+.how .ic.ic-star{transform:scale(1.18)}  /* Material's star sits small in its box; sized up to match the other icons by eye */
+
+/* Woden: the finale phone fades through finished walks, one weather colour each */
+.walls{position:absolute;inset:0;background:#FFFFFF}
+.walls img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:wf 6s linear infinite}
+.walls img:nth-child(2){animation-delay:1.2s}.walls img:nth-child(3){animation-delay:2.4s}.walls img:nth-child(4){animation-delay:3.6s}.walls img:nth-child(5){animation-delay:4.8s}
+@keyframes wf{0%{opacity:0}3%{opacity:1}20%{opacity:1}23%{opacity:0}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.walls img{animation:none}.walls img:first-child{opacity:1}}
+.fnote{margin-top:24px;max-width:26em}
+.heyhero .wrap{width:100%}
+@media (max-width:900px){ .heyhero{min-height:0;display:block;padding-top:calc(140px + env(safe-area-inset-top,0px))} }

@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
         source: "/lionel",
         destination: "/lionel/index.html",
       },
+      {
+        // Woden concept page (static, noindex), built in ~/Woden/site
+        source: "/woden",
+        destination: "/woden/index.html",
+      },
     ];
   },
   async headers() {
