@@ -188,7 +188,7 @@ const WHOLE = { target: new THREE.Vector3(), dist: null, elev: 0.95, az: 0.55 };
 const SHOTS = {
   0: { target: focus.clone(), dist: 20, elev: 1.0, az: 0.6 }, 1: { target: focus.clone(), dist: 20, elev: 1.0, az: 0.6 }, 2: { target: focus.clone(), dist: 14, elev: 1.0, az: 0.6 },
   3: { target: focus.clone(), dist: 6.5, elev: 0.7, az: 0.6 }, 4: { target: todayBalls[1].position.clone(), dist: 6, elev: 0.7, az: 0.6 },
-  5: { target: new THREE.Vector3(), dist: 34, elev: 1.05, az: 0.55 }, 6: { ...WHOLE },
+  5: { target: focus.clone(), dist: 26, elev: 1.0, az: 0.6 }, 6: { ...WHOLE },
 };
 let cam = { target: new THREE.Vector3(), dist: 100, elev: 0.95, az: 0.55 }, from = null, to = null, t0 = 0, spin = 0;
 function wholeDist() {
@@ -304,10 +304,10 @@ function tick(now) {
   const bk = step < 2 ? 0 : reduce ? 1 : Math.min(1, (now - ballsAt) / 500), be = 1 - Math.pow(1 - bk, 3);
   todayBalls.forEach((b, i) => { if (i === 1 && burst) return; b.visible = bk > 0; b.scale.setScalar(R_BALL * be); });
   // Every day adds a ring: the past arrives from today inwards as the camera pulls back.
-  // Every day adds a ring: the tree grows from its oldest ring at the centre out to today, one ring at a time.
-  // Slow at first, so the first rings read one by one, then quicker. Step 6 shows it all.
-  const gk = step < 5 ? 0 : step > 5 || reduce ? 1 : Math.max(0, Math.min(1, (now - pastAt) / 6000)), grown = Math.floor((DAYS - 1) * gk * gk);
-  days.forEach((g, d) => g.visible = d === 0 || d >= DAYS - 1 - grown);
+  // Every day adds a ring: from today's ring, the days before it appear one by one, going back in time.
+  // Slow at first, so the first rings read one by one, then quicker. Only step 6 pulls out to see it all.
+  const gk = step < 5 ? 0 : step > 5 || reduce ? 1 : Math.max(0, Math.min(1, (now - pastAt) / 6000)), shown = 1 + Math.floor((DAYS - 1) * gk * gk);
+  days.forEach((g, d) => g.visible = d < shown);
   renderer.setScissorTest(true);
   renderer.setViewport(0, 0, innerWidth, innerHeight); renderer.setScissor(0, 0, innerWidth, innerHeight); renderer.clear();
   renderer.setViewport(area.x, area.y, area.w, area.h); renderer.setScissor(area.x, area.y, area.w, area.h);
