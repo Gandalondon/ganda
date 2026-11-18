@@ -17,6 +17,7 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; margin: 0; background: #FFFFFF; color: var(--ink); font-family: var(--font); overflow: hidden; overscroll-behavior: none; }
 body { touch-action: none; }
+body.turning { cursor: grabbing; }
 #gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 
 /* Step 0: the word, filling the screen above the bar at the bottom. */
@@ -256,6 +257,7 @@ addEventListener('keydown', e => {
 // Scroll and swipe step too: one step per gesture.
 addEventListener('wheel', e => {
   e.preventDefault();
+  if (step === last && Math.abs(e.deltaX) > Math.abs(e.deltaY)) { vel = 0; spin -= e.deltaX * 0.004; turnedAt = performance.now(); return; }
   if (performance.now() - lock < 900 || Math.abs(e.deltaY) + Math.abs(e.deltaX) < 12) return;
   go(step + ((e.deltaY || e.deltaX) > 0 ? 1 : -1));
 }, { passive: false });
@@ -265,8 +267,22 @@ addEventListener('touchend', e => {
   if (tx == null || document.getElementById('sheet').classList.contains('on')) return;
   const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null;
   if (Math.max(Math.abs(dx), Math.abs(dy)) < 40) return;
+  if (step === last && Math.abs(dx) > Math.abs(dy)) return; // that was a spin
   go(step + ((Math.abs(dy) > Math.abs(dx) ? -dy : -dx) > 0 ? 1 : -1));
 });
+
+/* ---------- Last step: drag sideways to turn the tree (no zoom, no tilt) ---------- */
+let dragX = null, vel = 0, turnedAt = 0;
+addEventListener('pointerdown', e => {
+  if (step !== last || e.target.closest('a, button') || document.getElementById('sheet').classList.contains('on')) return;
+  dragX = e.clientX; vel = 0; document.body.classList.add('turning');
+});
+addEventListener('pointermove', e => {
+  if (dragX == null) return;
+  const d = (e.clientX - dragX) * 0.008; dragX = e.clientX; spin += d; vel = d / 0.016; turnedAt = performance.now();
+});
+const endDrag = () => { if (dragX == null) return; dragX = null; document.body.classList.remove('turning'); };
+addEventListener('pointerup', endDrag); addEventListener('pointercancel', endDrag);
 
 /* ---------- Privacy ---------- */
 const sheet = document.getElementById('sheet');
@@ -281,7 +297,9 @@ let lastT = performance.now();
 function tick(now) {
   requestAnimationFrame(tick);
   const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
-  if (!reduce && (step === 0 || step === 1 || step >= 5)) spin += dt * 0.05; // the slow turn, only on the wide shots
+  // Let go and it carries on a little, then the slow turn takes over again.
+  if (dragX == null && vel) { spin += vel * dt; vel *= Math.pow(0.04, dt); if (Math.abs(vel) < 0.02) vel = 0; }
+  if (!reduce && dragX == null && !vel && (step === 0 || step === 1 || step >= 5)) spin += dt * 0.05; // the slow turn, only on the wide shots
   if (to) {
     const k = Math.min(1, (now - t0) / 2200), e = ease(k);
     cam = { target: from.target.clone().lerp(to.target, e), dist: from.dist * Math.pow(to.dist / from.dist, e), elev: from.elev + (to.elev - from.elev) * e, az: from.az + (to.az - from.az) * e };
