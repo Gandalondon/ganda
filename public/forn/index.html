@@ -9,47 +9,51 @@
 <meta name="theme-color" content="#FFFFFF">
 <style>
 /* Forn concept page (18 Nov 2026). One screen, no scroll: the app's 3D rings fill it, one big line at a time
-   over them. Scroll, swipe, the arrow keys and the arrows all step back and forward. Text cuts between steps;
+   over them. Scroll, swipe and the arrow keys step back and forward (no buttons). Text cuts between steps;
    the camera carries the motion. Instrument Sans and three.js are bundled next to this file. */
 @font-face { font-family: "Instrument Sans"; src: url("/forn/instrument-sans.ttf") format("truetype"); font-weight: 400 700; font-stretch: 75% 100%; font-display: block; }
-:root { --ink: #1A1A1A; --soft: #3A3A3A; --font: "Instrument Sans", system-ui, sans-serif; --pad: clamp(24px, 4vw, 48px); }
+:root { --ink: #1A1A1A; --soft: #3A3A3A; --font: "Instrument Sans", system-ui, sans-serif; --pad: 24px; }
+@media (min-width: 900px) { :root { --pad: 80px; } }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; margin: 0; background: #FFFFFF; color: var(--ink); font-family: var(--font); overflow: hidden; overscroll-behavior: none; }
 body { touch-action: none; }
 #gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 
 /* Step 0: the word, filling the screen above the bar at the bottom. */
-.mark { position: fixed; left: 0; right: 0; top: 0; bottom: 72px; padding: var(--pad) var(--pad) 0; z-index: 2; background: #FFFFFF; }
+.mark { position: fixed; left: 0; right: 0; top: 0; bottom: calc(var(--pad) + 40px); padding: var(--pad) var(--pad) 0; z-index: 2; background: #FFFFFF; }
 .mark svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .mark text { font-family: var(--font); font-weight: 700; fill: var(--ink); }
 .mark[hidden] { display: none; }
 
-/* Steps: one big line and one quiet sentence, top left, over the rings. */
-.step { position: fixed; left: var(--pad); right: var(--pad); top: var(--pad); z-index: 3; max-width: 1100px; pointer-events: none; }
+/* Steps: one huge line each, nothing else. Narrow letters on a tall screen keep them big. */
+.step { position: fixed; left: var(--pad); right: var(--pad); top: var(--pad); z-index: 3; pointer-events: none; transition: color 0ms; }
 .step[hidden] { display: none; }
-.step h1, .step h2 { margin: 0; font-weight: 700; font-size: clamp(44px, 7.4vw, 124px); line-height: 1.02; letter-spacing: 0.005em; text-wrap: balance; max-width: 13ch; }
-.step p { margin: clamp(16px, 2vw, 24px) 0 0; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.45; color: var(--soft); max-width: 34ch; text-wrap: pretty; }
-.step .btn { pointer-events: auto; display: inline-flex; align-items: center; justify-content: center; height: 56px; padding: 0 28px; margin-top: 32px; border-radius: 999px; background: var(--ink); color: #FFFFFF; font: 600 17px/1 var(--font); text-decoration: none; }
+.step h1, .step h2 { margin: 0; font-weight: 700; font-size: min(12.5vw, 19vh); line-height: 0.95; letter-spacing: 0.005em; text-wrap: balance; }
+@media (max-aspect-ratio: 1/1) { .step h1, .step h2 { font-stretch: 75%; font-size: min(17vw, 13vh); } }
+.step .btn { pointer-events: auto; display: inline-flex; align-items: center; justify-content: center; height: 64px; padding: 0 32px; margin-top: 40px; border-radius: 999px; background: var(--ink); color: #FFFFFF; font: 600 19px/1 var(--font); text-decoration: none; }
 .step .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+body.dark .step { color: #FFFFFF; }
+
+/* At 9pm: an 80% black overlay, the line turns white, and the find sits on it as a plain white card. */
+.shade { position: fixed; inset: 0; z-index: 2; background: rgba(26,26,26,0.8); opacity: 0; pointer-events: none; transition: opacity 400ms ease; }
+body.dark .shade { opacity: 1; }
 
 /* The 9pm card, as in the app. */
-.card { position: fixed; z-index: 4; left: 50%; bottom: 96px; transform: translateX(-50%); width: min(360px, calc(100% - 2 * var(--pad))); border-radius: 28px; background: #FFFFFF; padding: 28px 24px 24px; box-shadow: 0 0 0 1px rgba(26,26,26,0.08), 0 24px 64px rgba(26,26,26,0.16); }
+.card { position: fixed; z-index: 4; left: var(--pad); right: var(--pad); bottom: calc(var(--pad) + 40px); max-width: 420px; margin-left: auto; border-radius: 28px; background: #FFFFFF; padding: 32px 28px 28px; }
 .card[hidden] { display: none; }
-@media (min-aspect-ratio: 11/10) { .card { left: auto; right: calc(var(--pad) + 64px); transform: none; bottom: 120px; } }
-.card b { display: block; font-size: 24px; line-height: 30px; font-weight: 600; letter-spacing: 0.2px; text-wrap: balance; }
+.card b { display: block; font-size: 26px; line-height: 32px; font-weight: 600; letter-spacing: 0.2px; text-wrap: balance; }
 .card span { display: block; margin-top: 12px; font-size: 15px; line-height: 20px; color: var(--soft); }
 
 /* Bottom bar: the credit and Privacy on the left, back and next on the right. */
-.bar { position: fixed; left: 0; right: 0; bottom: 0; height: 72px; padding: 0 var(--pad); display: flex; align-items: center; justify-content: space-between; gap: 16px; z-index: 5; font-size: 13px; line-height: 18px; color: var(--soft); }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; height: calc(var(--pad) + 40px); padding: 0 var(--pad) var(--pad); display: flex; align-items: center; justify-content: space-between; gap: 16px; z-index: 5; font-size: 13px; line-height: 18px; color: var(--soft); }
 .bar p { margin: 0; }
-.bar a, .bar .link { color: var(--ink); font-weight: 600; text-decoration: none; background: none; border: 0; padding: 0; font: inherit; font-weight: 600; cursor: pointer; }
-.arrows { display: flex; gap: 8px; }
-.arrows button { width: 48px; height: 48px; border-radius: 24px; border: 1px solid var(--ink); background: #FFFFFF; color: var(--ink); display: grid; place-items: center; cursor: pointer; }
-.arrows button[disabled] { opacity: 0.25; cursor: default; }
-.arrows button:focus-visible, .bar .link:focus-visible, .bar a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.bar a { color: inherit; text-decoration: none; }
+.bar .link { color: var(--ink); background: none; border: 0; padding: 0; font: inherit; font-weight: 600; cursor: pointer; }
+body.dark .bar, body.dark .bar .link { color: #FFFFFF; }
+.bar .link:focus-visible, .bar a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 /* Privacy: a card, like the app. */
-.sheet { position: fixed; inset: 0; z-index: 10; background: rgba(26,26,26,0.5); display: none; align-items: flex-end; justify-content: center; padding: var(--pad); }
+.sheet { position: fixed; inset: 0; z-index: 10; background: rgba(26,26,26,0.8); display: none; align-items: center; justify-content: center; padding: var(--pad); }
 .sheet.on { display: flex; }
 .sheet article { width: min(520px, 100%); max-height: 100%; overflow: auto; background: #FFFFFF; border-radius: 28px; padding: 32px 24px 24px; }
 .sheet h2 { margin: 0; font-size: 28px; line-height: 34px; font-weight: 600; }
@@ -67,22 +71,19 @@ body { touch-action: none; }
 </div>
 
 <main>
-  <section class="step" data-s="1" hidden><h1>You pass history every day.</h1><p>Most of it, you never notice.</p></section>
-  <section class="step" data-s="2" hidden><h2>Forn notices it for you.</h2><p>It quietly notes the old places you pass while you get on with your day. Your location never leaves your phone.</p></section>
-  <section class="step" data-s="3" hidden><h2>At 9pm, find out what you passed.</h2><p>Up to five finds, the most interesting first.</p></section>
-  <section class="step" data-s="4" hidden><h2>Keep it, or let it go.</h2><p>Swipe right if it’s interesting. Swipe left and it turns to dust.</p></section>
-  <section class="step" data-s="5" hidden><h2>Every day adds a ring.</h2><p>Over time it becomes a picture of everything you’ve learned, just by living your life.</p></section>
-  <section class="step" data-s="6" hidden><h2>Coming soon to Android.</h2><p>Forn is in testing. If you want to try it early, let me know.</p><a class="btn" href="mailto:tony@gandalondon.com?subject=Try%20Forn%20early" target="_blank" rel="noopener">Try it early</a></section>
+  <section class="step" data-s="1" hidden><h1>You pass history every day.</h1></section>
+  <section class="step" data-s="2" hidden><h2>Forn notices it for you.</h2></section>
+  <section class="step" data-s="3" hidden><h2>At 9pm, find out what you passed.</h2></section>
+  <section class="step" data-s="4" hidden><h2>Keep it, or let it go.</h2></section>
+  <section class="step" data-s="5" hidden><h2>Every day adds a ring.</h2></section>
+  <section class="step" data-s="6" hidden><h2>Coming soon to Android.</h2><a class="btn" href="mailto:tony@gandalondon.com?subject=Try%20Forn%20early" target="_blank" rel="noopener">Try it early</a></section>
 </main>
 
+<div class="shade" aria-hidden="true"></div>
 <div class="card" id="card" hidden aria-live="polite"><b>In 1889 a guidebook writer called a Norfolk halt possibly the least important station in England, except Raynes Park.</b><span>Raynes Park station, 10:42</span></div>
 
 <div class="bar">
   <p>&copy; 2026 Forn<span class="who">, a concept by <a href="https://gandalondon.com" target="_blank" rel="noopener">Tony Goff-Yu</a></span>. <button type="button" class="link" id="privacy">Privacy</button></p>
-  <div class="arrows">
-    <button type="button" id="prev" aria-label="Back"><svg viewBox="0 -960 960 960" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="m274-450 227 227q9 9 9 21t-9 21q-9 9-21 9t-21-9L181-459q-5-5-7-10t-2-11q0-6 2-11t7-10l278-278q9-9 21-9t21 9q9 9 9 21t-9 21L274-510h496q13 0 21.5 8.5T800-480q0 13-8.5 21.5T770-450H274Z"/></svg></button>
-    <button type="button" id="next" aria-label="Next"><svg viewBox="0 -960 960 960" width="24" height="24" fill="currentColor" aria-hidden="true" style="transform: scaleX(-1)"><path d="m274-450 227 227q9 9 9 21t-9 21q-9 9-21 9t-21-9L181-459q-5-5-7-10t-2-11q0-6 2-11t7-10l278-278q9-9 21-9t21 9q9 9 9 21t-9 21L274-510h496q13 0 21.5 8.5T800-480q0 13-8.5 21.5T770-450H274Z"/></svg></button>
-  </div>
 </div>
 <p class="sr" aria-live="polite" id="live"></p>
 
@@ -155,7 +156,10 @@ function dust(pos, settled) {
   }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(settled ? end.slice() : start.slice(), 3));
   const p = new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8A8A8A, size: 0.022, transparent: true, opacity: settled ? 0.55 : 0 }));
-  group.add(p); return { p, start, end };
+  // Each speck gets its own slow drift, so a fresh burst floats like dust in still air.
+  const drift = new Float32Array(PARTS * 4);
+  for (let i = 0; i < PARTS; i++) drift.set([r() * Math.PI * 2, 0.25 + r() * 0.5, 0.03 + r() * 0.07, r() * Math.PI * 2], i * 4);
+  group.add(p); return { p, start, end, drift };
 }
 for (let d = 1; d < DAYS; d++) {
   if (r() > 0.5) continue;
@@ -214,8 +218,7 @@ function go(n) {
   document.getElementById('mark').hidden = step !== 0;
   steps.forEach(s => s.hidden = +s.dataset.s !== step);
   document.getElementById('card').hidden = step !== 3;
-  document.getElementById('prev').disabled = step === 0;
-  document.getElementById('next').disabled = step === last;
+  document.body.classList.toggle('dark', step === 3);
   const s = steps.find(x => +x.dataset.s === step);
   document.getElementById('live').textContent = s ? s.textContent : 'Forn';
   // Step 4: the middle ball bursts into dust. Going back puts it back.
@@ -224,8 +227,6 @@ function go(n) {
   from = { ...cam, target: cam.target.clone() }; to = shot(step); t0 = performance.now();
   if (reduce) { cam = to; to = null; }
 }
-document.getElementById('next').addEventListener('click', () => go(step + 1));
-document.getElementById('prev').addEventListener('click', () => go(step - 1));
 addEventListener('keydown', e => {
   if (document.getElementById('sheet').classList.contains('on')) { if (e.key === 'Escape') closeSheet(); return; }
   if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(step + 1); }
@@ -266,17 +267,22 @@ function tick(now) {
     if (k >= 1) to = null;
   }
   if (burst) {
-    const k = Math.max(0, Math.min(1, (now - burstAt) / 1000 - 0.6) / 1.4), e = 1 - Math.pow(1 - k, 4);
-    todayBalls[1].scale.setScalar(R_BALL * Math.max(0, 1 - k * 4)); todayBalls[1].visible = k < 0.25;
-    const a = burst.p.geometry.attributes.position.array;
-    for (let i = 0; i < a.length; i++) a[i] = burst.start[i] + (burst.end[i] - burst.start[i]) * e;
+    // A pause, a slow eased burst (about 2.5s), then the dust keeps drifting.
+    const secs = (now - burstAt) / 1000, k = Math.max(0, Math.min(1, (secs - 0.8) / 2.5)), e = 1 - Math.pow(1 - k, 5);
+    todayBalls[1].scale.setScalar(R_BALL * Math.max(0, 1 - k * 3)); todayBalls[1].visible = k < 0.34;
+    const a = burst.p.geometry.attributes.position.array, dr = burst.drift, f = e;
+    for (let i = 0, j = 0; i < a.length; i += 3, j += 4) {
+      const ph = dr[j], sp = dr[j + 1], amp = dr[j + 2] * f, ph2 = dr[j + 3];
+      a[i] = burst.start[i] + (burst.end[i] - burst.start[i]) * e + Math.sin(secs * sp + ph) * amp;
+      a[i + 1] = burst.start[i + 1] + (burst.end[i + 1] - burst.start[i + 1]) * e + Math.sin(secs * sp * 0.8 + ph2) * amp + secs * 0.004 * f;
+      a[i + 2] = burst.start[i + 2] + (burst.end[i + 2] - burst.start[i + 2]) * e + Math.cos(secs * sp * 0.9 + ph) * amp;
+    }
     burst.p.geometry.attributes.position.needsUpdate = true; burst.p.material.opacity = k > 0 ? 0.55 : 0;
   }
   place(cam); renderer.render(scene, camera);
 }
 document.fonts.load('700 200px "Instrument Sans"').then(() => { resize(); cam = shot(0); }).catch(resize);
 resize(); cam = shot(0);
-document.getElementById('prev').disabled = true;
 requestAnimationFrame(tick);
 })();
 </script>
