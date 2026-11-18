@@ -32,6 +32,15 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Forn concept page: keep it out of search results
+        source: "/forn/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
+        source: "/forn",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
         source: "/(.*)",
         headers: [
           {
