@@ -22,6 +22,11 @@ const nextConfig: NextConfig = {
         source: "/woden",
         destination: "/woden/index.html",
       },
+      {
+        // Forn concept page (static, noindex): the app's 3D rings with one big line at a time
+        source: "/forn",
+        destination: "/forn/index.html",
+      },
     ];
   },
   async headers() {
