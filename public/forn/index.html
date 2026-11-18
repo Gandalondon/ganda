@@ -113,7 +113,10 @@ function fitMark() {
   const m = c.measureText('FORN');
   const left = m.actualBoundingBoxLeft, right = m.actualBoundingBoxRight, up = m.actualBoundingBoxAscent, down = m.actualBoundingBoxDescent;
   markText.setAttribute('font-size', '200');
-  markSvg.setAttribute('viewBox', `${-left} ${-up} ${left + right} ${up + down}`);
+  // Sideways, use the SVG's own measure (the canvas can't always apply the narrow width); up and down, the tight glyph measure.
+  let x = -left, w = left + right;
+  try { const b = markText.getBBox(); if (b.width) { x = b.x; w = b.width; } } catch (e) {}
+  markSvg.setAttribute('viewBox', `${x} ${-up} ${w} ${up + down}`);
 }
 
 /* ---------- The rings (from the app) ---------- */
