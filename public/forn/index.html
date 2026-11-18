@@ -139,19 +139,21 @@ const today = new Date();
 function rankOf(d) { const t = new Date(today); t.setDate(t.getDate() - d); return t.getMonth() === 0 && t.getDate() === 1 ? 3 : t.getDate() === 1 ? 2 : t.getDay() === 1 ? 1 : 0; }
 const RING_COL = [0xC8C8C8, 0xA8A8A8, 0x6A6A6A, 0x1A1A1A], RING_W = [0, 0.015, 0.035, 0.08];
 const group = new THREE.Group(); scene.add(group);
+// One group per day, so the past can arrive ring by ring on step 5. Day 0 is today.
+const days = Array.from({ length: DAYS }, () => { const g = new THREE.Group(); group.add(g); return g; });
 for (let d = 0; d < DAYS; d++) {
   let rank = rankOf(d);
   if (rank === 1 && [-2, -1, 1, 2].some(k => d + k >= 0 && d + k < DAYS && rankOf(d + k) >= 2)) rank = 0;
   const R = ringR(d), segs = Math.min(1024, Math.max(96, Math.round(R * 6))), pts = [];
   for (let i = 0; i <= segs; i++) { const a = i / segs * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(a) * R, 0, Math.sin(a) * R)); }
-  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), rank === 0 ? new THREE.LineDashedMaterial({ color: RING_COL[0], dashSize: 0.03, gapSize: 0.07 }) : new THREE.LineBasicMaterial({ color: RING_COL[rank] }));
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), rank === 0 ? new THREE.LineDashedMaterial({ color: d === 0 ? 0x8A8A8A : RING_COL[0], dashSize: 0.03, gapSize: 0.07 }) : new THREE.LineBasicMaterial({ color: RING_COL[rank] }));
   if (rank === 0) line.computeLineDistances();
-  group.add(line);
-  if (rank) { const m = new THREE.Mesh(new THREE.RingGeometry(R - RING_W[rank] / 2, R + RING_W[rank] / 2, segs), new THREE.MeshBasicMaterial({ color: RING_COL[rank], side: THREE.DoubleSide })); m.rotation.x = -Math.PI / 2; group.add(m); }
+  days[d].add(line);
+  if (rank) { const m = new THREE.Mesh(new THREE.RingGeometry(R - RING_W[rank] / 2, R + RING_W[rank] / 2, segs), new THREE.MeshBasicMaterial({ color: RING_COL[rank], side: THREE.DoubleSide })); m.rotation.x = -Math.PI / 2; days[d].add(m); }
 }
 // Example past: finds on about half the days, two thirds kept, the rest settled dust.
 const r = rng(11);
-function dust(pos, settled) {
+function dust(pos, settled, into = group) {
   const start = new Float32Array(PARTS * 3), end = new Float32Array(PARTS * 3);
   for (let i = 0; i < PARTS; i++) {
     const u = r() * 2 - 1, th = r() * Math.PI * 2, s = Math.sqrt(1 - u * u), d = 0.2 + Math.pow(r(), 0.7) * 0.6;
@@ -162,14 +164,14 @@ function dust(pos, settled) {
   // Each speck gets its own slow drift, so a fresh burst floats like dust in still air.
   const drift = new Float32Array(PARTS * 4);
   for (let i = 0; i < PARTS; i++) drift.set([r() * Math.PI * 2, 0.25 + r() * 0.5, 0.03 + r() * 0.07, r() * Math.PI * 2], i * 4);
-  group.add(p); return { p, start, end, drift };
+  into.add(p); return { p, start, end, drift };
 }
 for (let d = 1; d < DAYS; d++) {
   if (r() > 0.5) continue;
   const n = 1 + Math.floor(r() * 2);
   for (let i = 0; i < n; i++) {
     const th = r() * Math.PI * 2, R = ringR(d) + (r() - 0.5) * 0.1, pos = new THREE.Vector3(Math.cos(th) * R, (r() - 0.5) * 0.08, Math.sin(th) * R);
-    if (r() < 0.66) { const m = new THREE.Mesh(SPH, INK); m.scale.setScalar(R_BALL); m.position.copy(pos); group.add(m); } else dust(pos, true);
+    if (r() < 0.66) { const m = new THREE.Mesh(SPH, INK); m.scale.setScalar(R_BALL); m.position.copy(pos); days[d].add(m); } else dust(pos, true, days[d]);
   }
 }
 // Today: three finds on a short arc of the outer ring. The first is the station card; the second bursts on step 4.
@@ -177,13 +179,13 @@ const RT = ringR(0), todayBalls = [0, 1, 2].map(i => {
   const th = 0.6 + (i - 1) * (0.6 / RT), m = new THREE.Mesh(SPH, INK);
   m.scale.setScalar(R_BALL); m.position.set(Math.cos(th) * RT, 0, Math.sin(th) * RT); group.add(m); return m;
 });
-let burst = null, burstAt = 0;
+let burst = null, burstAt = 0, ballsAt = 0, pastAt = 0;
 
 /* ---------- Camera: where each step looks ---------- */
 const focus = todayBalls[0].position.clone();
 const WHOLE = { target: new THREE.Vector3(), dist: null, elev: 0.95, az: 0.55 };
 const SHOTS = {
-  0: { ...WHOLE }, 1: { ...WHOLE }, 2: { target: focus.clone(), dist: 14, elev: 1.0, az: 0.6 },
+  0: { target: focus.clone(), dist: 20, elev: 1.0, az: 0.6 }, 1: { target: focus.clone(), dist: 20, elev: 1.0, az: 0.6 }, 2: { target: focus.clone(), dist: 14, elev: 1.0, az: 0.6 },
   3: { target: focus.clone(), dist: 6.5, elev: 0.7, az: 0.6 }, 4: { target: todayBalls[1].position.clone(), dist: 6, elev: 0.7, az: 0.6 },
   5: { ...WHOLE }, 6: { ...WHOLE },
 };
@@ -199,12 +201,19 @@ function place(c) {
   camera.lookAt(c.target);
 }
 // The rings sit in the space the text leaves: below it on a phone, to the right of it on a wide screen.
-let freeK = 1;
+let freeK = 1, area = { x: 0, y: 0, w: 1, h: 1 };
 function resize() {
-  const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h;
-  const wide = w > h * 1.1, bar = 72;
-  if (wide) { camera.setViewOffset(w, h, -w * 0.22, -h * 0.1, w, h); freeK = 0.8; } // rings low and right, clear of the line
-  else { camera.setViewOffset(w, h, 0, -h * 0.17, w, h); freeK = 0.6; }
+  const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false);
+  // The rings live only in the space under the tallest heading, so lines never run through the words.
+  // At 9pm the overlay covers everything, so that step does not count.
+  let low = 0;
+  steps.forEach(x => { if (+x.dataset.s === 3) return; const was = x.hidden; x.hidden = false; low = Math.max(low, x.getBoundingClientRect().bottom); x.hidden = was; });
+  const top = Math.round(low + 32), bottom = Math.round(document.querySelector('.bar').getBoundingClientRect().height);
+  if (w > h * 1.1) { // wide: the words fill the screen, so the rings sit low and right behind them as before
+    area = { x: 0, y: 0, w, h }; camera.aspect = w / h; camera.setViewOffset(w, h, -w * 0.22, -h * 0.1, w, h); freeK = 0.8;
+  } else {
+    area = { x: 0, y: bottom, w, h: Math.max(80, h - top - bottom) }; camera.aspect = area.w / area.h; camera.clearViewOffset(); freeK = 0.92;
+  }
   camera.updateProjectionMatrix();
   fitMark();
   if (!to) { cam = shot(step); }
@@ -230,6 +239,9 @@ function go(n) {
   // Step 4: the middle ball bursts into dust. Going back puts it back.
   if (step === 4 && !burst) { burst = dust(todayBalls[1].position.clone(), false); burstAt = performance.now(); }
   if (step < 4 && burst) { group.remove(burst.p); burst.p.geometry.dispose(); burst = null; todayBalls[1].visible = true; todayBalls[1].scale.setScalar(R_BALL); }
+  if (step >= 2 && prev < 2) ballsAt = performance.now();
+  if (step >= 5 && prev < 5) pastAt = performance.now();
+  if (step < 5) pastAt = 0;
   from = { ...cam, target: cam.target.clone() }; to = shot(step); t0 = performance.now();
   if (reduce) { cam = to; to = null; }
 }
@@ -288,6 +300,15 @@ function tick(now) {
     }
     burst.p.geometry.attributes.position.needsUpdate = true; burst.p.material.opacity = k > 0 ? 0.55 : 0;
   }
+  // Today's finds pop in on step 2; before that, today's ring is empty.
+  const bk = step < 2 ? 0 : reduce ? 1 : Math.min(1, (now - ballsAt) / 500), be = 1 - Math.pow(1 - bk, 3);
+  todayBalls.forEach((b, i) => { if (i === 1 && burst) return; b.visible = bk > 0; b.scale.setScalar(R_BALL * be); });
+  // Every day adds a ring: the past arrives from today inwards as the camera pulls back.
+  const shown = step < 5 ? 1 : reduce ? DAYS : 1 + Math.floor((DAYS - 1) * Math.min(1, (now - pastAt) / 1800));
+  days.forEach((g, d) => g.visible = d < shown);
+  renderer.setScissorTest(true);
+  renderer.setViewport(0, 0, innerWidth, innerHeight); renderer.setScissor(0, 0, innerWidth, innerHeight); renderer.clear();
+  renderer.setViewport(area.x, area.y, area.w, area.h); renderer.setScissor(area.x, area.y, area.w, area.h);
   place(cam); renderer.render(scene, camera);
 }
 document.fonts.load('600 200px "Instrument Sans"').then(() => { resize(); cam = shot(0); }).catch(resize);
