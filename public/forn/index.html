@@ -24,6 +24,7 @@ body { touch-action: none; }
 .mark svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .mark text { font-family: var(--font); font-weight: 600; fill: var(--ink); }
 .mark[hidden] { display: none; }
+.mark text { visibility: hidden; } .mark.ready text { visibility: visible; } /* no flash of a small FORN before the font loads and fits */
 
 /* Steps: one huge line each, nothing else. Narrow letters on a tall screen keep them big. */
 .step { position: fixed; left: var(--pad); right: var(--pad); top: var(--pad); z-index: 3; pointer-events: none; transition: color 400ms ease; }
@@ -312,7 +313,9 @@ function tick(now) {
   renderer.setViewport(area.x, area.y, area.w, area.h); renderer.setScissor(area.x, area.y, area.w, area.h);
   place(cam); renderer.render(scene, camera);
 }
-document.fonts.load('600 200px "Instrument Sans"').then(() => { resize(); cam = shot(0); }).catch(resize);
+const ready = () => document.getElementById('mark').classList.add('ready');
+document.fonts.load('600 200px "Instrument Sans"').then(() => { resize(); cam = shot(0); ready(); }).catch(() => { resize(); ready(); });
+setTimeout(() => { resize(); ready(); }, 3000); // never leave the mark hidden
 resize(); cam = shot(0);
 requestAnimationFrame(tick);
 })();
