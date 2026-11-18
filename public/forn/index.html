@@ -53,9 +53,9 @@ body.dark .card { opacity: 1; }
 /* Bottom bar: the credit and Privacy on the left, back and next on the right. */
 .bar { position: fixed; left: 0; right: 0; bottom: 0; height: calc(var(--pad) + 24px); padding: 0 var(--pad) var(--pad); align-items: flex-end; display: flex; align-items: center; justify-content: space-between; gap: 16px; z-index: 5; font-size: 13px; line-height: 18px; color: var(--soft); }
 .bar p { margin: 0; }
-.bar a { color: inherit; text-decoration: none; }
-.bar .link { color: var(--ink); background: none; border: 0; padding: 0; font: inherit; font-weight: 600; cursor: pointer; }
-body.dark .bar, body.dark .bar .link { color: #FFFFFF; }
+.bar a { color: var(--ink); font-weight: 500; text-decoration: none; }
+.bar .link { color: var(--ink); background: none; border: 0; padding: 0; font: inherit; font-weight: 500; cursor: pointer; }
+body.dark .bar, body.dark .bar .link, body.dark .bar a { color: #FFFFFF; }
 .bar .link:focus-visible, .bar a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
 /* Privacy: a card, like the app. */
@@ -141,6 +141,10 @@ const ringR = d => 0.5 + (DAYS - 1 - d) * STEP_W;
 const today = new Date();
 function rankOf(d) { const t = new Date(today); t.setDate(t.getDate() - d); return t.getMonth() === 0 && t.getDate() === 1 ? 3 : t.getDate() === 1 ? 2 : t.getDay() === 1 ? 1 : 0; }
 const RING_COL = [0xC8C8C8, 0xA8A8A8, 0x6A6A6A, 0x1A1A1A], RING_W = [0, 0.015, 0.035, 0.08];
+// Shared materials, so the level of detail below can fade a whole kind of ring at once.
+const TODAY_MAT = new THREE.LineDashedMaterial({ color: 0x8A8A8A, dashSize: 0.03, gapSize: 0.07 });
+const LINE_MAT = RING_COL.map((c, k) => k === 0 ? new THREE.LineDashedMaterial({ color: c, dashSize: 0.03, gapSize: 0.07, transparent: true }) : new THREE.LineBasicMaterial({ color: c, transparent: true }));
+const BAND_MAT = RING_COL.map(c => new THREE.MeshBasicMaterial({ color: c, side: THREE.DoubleSide, transparent: true }));
 const group = new THREE.Group(); scene.add(group);
 // One group per day, so the past can arrive ring by ring on step 5. Day 0 is today.
 const days = Array.from({ length: DAYS }, () => { const g = new THREE.Group(); group.add(g); return g; });
@@ -149,10 +153,10 @@ for (let d = 0; d < DAYS; d++) {
   if (rank === 1 && [-2, -1, 1, 2].some(k => d + k >= 0 && d + k < DAYS && rankOf(d + k) >= 2)) rank = 0;
   const R = ringR(d), segs = Math.min(1024, Math.max(96, Math.round(R * 6))), pts = [];
   for (let i = 0; i <= segs; i++) { const a = i / segs * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(a) * R, 0, Math.sin(a) * R)); }
-  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), rank === 0 ? new THREE.LineDashedMaterial({ color: d === 0 ? 0x8A8A8A : RING_COL[0], dashSize: 0.03, gapSize: 0.07 }) : new THREE.LineBasicMaterial({ color: RING_COL[rank] }));
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), rank === 0 ? (d === 0 ? TODAY_MAT : LINE_MAT[0]) : LINE_MAT[rank]);
   if (rank === 0) line.computeLineDistances();
   days[d].add(line);
-  if (rank) { const m = new THREE.Mesh(new THREE.RingGeometry(R - RING_W[rank] / 2, R + RING_W[rank] / 2, segs), new THREE.MeshBasicMaterial({ color: RING_COL[rank], side: THREE.DoubleSide })); m.rotation.x = -Math.PI / 2; days[d].add(m); }
+  if (rank) { const m = new THREE.Mesh(new THREE.RingGeometry(R - RING_W[rank] / 2, R + RING_W[rank] / 2, segs), BAND_MAT[rank]); m.rotation.x = -Math.PI / 2; days[d].add(m); }
 }
 // Example past: finds on about half the days, two thirds kept, the rest settled dust.
 const r = rng(11);
@@ -292,6 +296,19 @@ document.getElementById('sheetClose').addEventListener('click', closeSheet);
 sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
 
 /* ---------- Loop ---------- */
+// Level of detail (18 Nov, after Tony saw a shimmer zoomed out on his phone): rings packed closer than a few
+// pixels beat against the screen's pixel grid (moire). So fine rings fade as they crowd: days first, then Mondays.
+// Bands thinner than a pixel hide and leave their hairline, which always draws at one pixel.
+const PERIOD = [1, 7, 30, 365];
+function lod() {
+  const ppu = area.h / (2 * cam.dist * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2)); // CSS px per unit at the focus
+  const fade = px => Math.max(0, Math.min(1, (px - 4) / 4)); // gone under 4px apart, full from 8px
+  for (let k = 0; k < 4; k++) {
+    const a = k === 3 ? 1 : fade(STEP_W * PERIOD[k] * ppu);
+    LINE_MAT[k].opacity = a; LINE_MAT[k].visible = a > 0.01;
+    BAND_MAT[k].opacity = a; BAND_MAT[k].visible = a > 0.01 && RING_W[k] * ppu * renderer.getPixelRatio() >= 1;
+  }
+}
 const ease = k => k < 0.5 ? 16 * k ** 5 : 1 - Math.pow(-2 * k + 2, 5) / 2; // a slow start and a soft landing
 let lastT = performance.now();
 function tick(now) {
@@ -329,7 +346,7 @@ function tick(now) {
   renderer.setScissorTest(true);
   renderer.setViewport(0, 0, innerWidth, innerHeight); renderer.setScissor(0, 0, innerWidth, innerHeight); renderer.clear();
   renderer.setViewport(area.x, area.y, area.w, area.h); renderer.setScissor(area.x, area.y, area.w, area.h);
-  place(cam); renderer.render(scene, camera);
+  place(cam); lod(); renderer.render(scene, camera);
 }
 const ready = () => document.getElementById('mark').classList.add('ready');
 document.fonts.load('600 200px "Instrument Sans"').then(() => { resize(); cam = shot(0); ready(); }).catch(() => { resize(); ready(); });
