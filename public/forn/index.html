@@ -30,7 +30,7 @@ body { touch-action: none; }
 .step[hidden] { display: none; }
 /* Lines are broken by hand, so each line is as big as the screen allows. */
 .step h1, .step h2 { margin: 0; font-weight: 600; font-size: min(15vw, 24vh); line-height: 0.92; letter-spacing: 0.005em; }
-@media (max-aspect-ratio: 1/1) { .step h1, .step h2 { font-stretch: 75%; font-size: min(21vw, 15vh); } }
+@media (max-aspect-ratio: 1/1) { .step h1, .step h2 { font-size: min(16.5vw, 13vh); } } /* normal width, as in the app; only the word FORN narrows */
 .step .btn { pointer-events: auto; display: inline-flex; align-items: center; justify-content: center; height: 64px; padding: 0 32px; margin-top: 40px; border-radius: 999px; background: var(--ink); color: #FFFFFF; font: 600 19px/1 var(--font); text-decoration: none; }
 .step .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 body.dark .step { color: #FFFFFF; }
@@ -63,7 +63,7 @@ body.dark .bar, body.dark .bar .link { color: #FFFFFF; }
 .sheet p { margin: 12px 0 0; font-size: 17px; line-height: 24px; color: var(--soft); text-wrap: pretty; }
 .sheet button { margin-top: 24px; width: 100%; height: 56px; border-radius: 999px; border: 1px solid var(--ink); background: transparent; color: var(--ink); font: 600 17px/1 var(--font); cursor: pointer; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@media (max-width: 520px) { .bar { font-size: 12px; } .bar .who { display: none; } }
+@media (max-width: 520px) { .bar { font-size: 12px; } }
 </style>
 </head>
 <body>
