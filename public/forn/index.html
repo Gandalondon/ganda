@@ -160,6 +160,9 @@ for (let d = 0; d < DAYS; d++) {
 }
 // Example past: finds on about half the days, two thirds kept, the rest settled dust.
 const r = rng(11);
+// Round dust (18 Nov): points draw as squares by default, so each speck uses a small round sprite (same as the app).
+const DOT = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  x.fillStyle = '#FFFFFF'; x.beginPath(); x.arc(32, 32, 30, 0, Math.PI * 2); x.fill(); return new THREE.CanvasTexture(c); })();
 function dust(pos, settled, into = group) {
   const start = new Float32Array(PARTS * 3), end = new Float32Array(PARTS * 3);
   for (let i = 0; i < PARTS; i++) {
@@ -167,7 +170,7 @@ function dust(pos, settled, into = group) {
     start.set([pos.x, pos.y, pos.z], i * 3); end.set([pos.x + s * Math.cos(th) * d, pos.y + u * d, pos.z + s * Math.sin(th) * d], i * 3);
   }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(settled ? end.slice() : start.slice(), 3));
-  const p = new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8A8A8A, size: 0.022, transparent: true, opacity: settled ? 0.55 : 0 }));
+  const p = new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8A8A8A, size: 0.022, map: DOT, alphaTest: 0.01, transparent: true, opacity: settled ? 0.55 : 0 }));
   // Each speck gets its own slow drift, so a fresh burst floats like dust in still air.
   const drift = new Float32Array(PARTS * 4);
   for (let i = 0; i < PARTS; i++) drift.set([r() * Math.PI * 2, 0.25 + r() * 0.5, 0.03 + r() * 0.07, r() * Math.PI * 2], i * 4);
