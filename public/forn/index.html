@@ -139,7 +139,11 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function rng(seed) { return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
 const ringR = d => 0.5 + (DAYS - 1 - d) * STEP_W;
 const today = new Date();
-function rankOf(d) { const t = new Date(today); t.setDate(t.getDate() - d); return t.getMonth() === 0 && t.getDate() === 1 ? 3 : t.getDate() === 1 ? 2 : t.getDay() === 1 ? 1 : 0; }
+// Regular rings (19 Nov): every 7th day a week ring (Mondays), every 4th week a thicker one, every 13th of those
+// (52 weeks) the year ring. Counted from Monday 29 Dec 2025 (start of 2026's week 1), so the year ring lands at New Year.
+const EPOCH = new Date(2025, 11, 29);
+function rankOf(d) { const t = new Date(today); t.setDate(t.getDate() - d); if (t.getDay() !== 1) return 0;
+  const w = Math.round((t - EPOCH) / 6048e5), m = ((w % 52) + 52) % 52; return m === 0 ? 3 : m % 4 === 0 ? 2 : 1; }
 const RING_COL = [0xC8C8C8, 0xA8A8A8, 0x6A6A6A, 0x1A1A1A], RING_W = [0, 0.015, 0.035, 0.08];
 // Shared materials, so the level of detail below can fade a whole kind of ring at once.
 const TODAY_MAT = new THREE.LineDashedMaterial({ color: 0x8A8A8A, dashSize: 0.03, gapSize: 0.07 });
@@ -150,7 +154,6 @@ const group = new THREE.Group(); scene.add(group);
 const days = Array.from({ length: DAYS }, () => { const g = new THREE.Group(); group.add(g); return g; });
 for (let d = 0; d < DAYS; d++) {
   let rank = rankOf(d);
-  if (rank === 1 && [-2, -1, 1, 2].some(k => d + k >= 0 && d + k < DAYS && rankOf(d + k) >= 2)) rank = 0;
   const R = ringR(d), segs = Math.min(1024, Math.max(96, Math.round(R * 6))), pts = [];
   for (let i = 0; i <= segs; i++) { const a = i / segs * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(a) * R, 0, Math.sin(a) * R)); }
   const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), rank === 0 ? (d === 0 ? TODAY_MAT : LINE_MAT[0]) : LINE_MAT[rank]);
@@ -302,7 +305,7 @@ sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
 // Level of detail (18 Nov, after Tony saw a shimmer zoomed out on his phone): rings packed closer than a few
 // pixels beat against the screen's pixel grid (moire). So fine rings fade as they crowd: days first, then Mondays.
 // Bands thinner than a pixel hide and leave their hairline, which always draws at one pixel.
-const PERIOD = [1, 7, 30, 365];
+const PERIOD = [1, 7, 28, 364];
 function lod() {
   const ppu = area.h / (2 * cam.dist * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2)); // CSS px per unit at the focus
   const fade = px => Math.max(0, Math.min(1, (px - 4) / 4)); // gone under 4px apart, full from 8px
