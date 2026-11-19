@@ -173,10 +173,11 @@ function dust(pos, settled, into = group) {
     start.set([pos.x, pos.y, pos.z], i * 3); end.set([pos.x + s * Math.cos(th) * d, pos.y + u * d, pos.z + s * Math.sin(th) * d], i * 3);
   }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(settled ? end.slice() : start.slice(), 3));
-  const p = new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8A8A8A, size: 0.022, map: DOT, alphaTest: 0.01, transparent: true, opacity: settled ? 0.55 : 0 }));
+  const p = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xC8C8C8, size: 0.022, map: DOT, alphaTest: 0.5 }));
   // Each speck gets its own slow drift, so a fresh burst floats like dust in still air.
   const drift = new Float32Array(PARTS * 4);
   for (let i = 0; i < PARTS; i++) drift.set([r() * Math.PI * 2, 0.25 + r() * 0.5, 0.03 + r() * 0.07, r() * Math.PI * 2], i * 4);
+  p.visible = settled; // solid light grey, no opacity: overlapping specks merge into one flat grey (19 Nov)
   into.add(p); return { p, start, end, drift };
 }
 for (let d = 1; d < DAYS; d++) {
@@ -339,7 +340,7 @@ function tick(now) {
       a[i + 1] = burst.start[i + 1] + (burst.end[i + 1] - burst.start[i + 1]) * e + Math.sin(secs * sp * 0.8 + ph2) * amp + secs * 0.004 * f;
       a[i + 2] = burst.start[i + 2] + (burst.end[i + 2] - burst.start[i + 2]) * e + Math.cos(secs * sp * 0.9 + ph) * amp;
     }
-    burst.p.geometry.attributes.position.needsUpdate = true; burst.p.material.opacity = k > 0 ? 0.55 : 0;
+    burst.p.geometry.attributes.position.needsUpdate = true; burst.p.visible = k > 0;
   }
   // Today's finds pop in on step 2; before that, today's ring is empty.
   const bk = step < 2 ? 0 : reduce ? 1 : Math.min(1, (now - ballsAt) / 500), be = 1 - Math.pow(1 - bk, 3);
